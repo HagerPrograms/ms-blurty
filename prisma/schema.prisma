@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model DISLIKES {
+  id      Int    @id @default(autoincrement())
+  user_id Int?
+  post_id Int?
+  POSTS   POSTS? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
+  USERS   USERS? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model LIKES {
+  id      Int    @id @default(autoincrement())
+  user_id Int?
+  post_id Int?
+  POSTS   POSTS? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
+  USERS   USERS? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model POSTS {
+  id                       Int        @id @default(autoincrement())
+  text                     String?
+  created_on               DateTime?  @db.Timestamp(6)
+  media_url                String?
+  logical_delete_indicator Boolean?
+  parent_post_id           Int?
+  school_id                Int?
+  author_id                Int?
+  DISLIKES                 DISLIKES[]
+  LIKES                    LIKES[]
+  USERS                    USERS?     @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_author")
+  POSTS                    POSTS?     @relation("POSTSToPOSTS", fields: [parent_post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_parent_post")
+  other_POSTS              POSTS[]    @relation("POSTSToPOSTS")
+  SCHOOLS                  SCHOOLS?   @relation(fields: [school_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_school")
+  REPORTS                  REPORTS[]
+}
+
+model REPORTS {
+  id                       Int       @id @default(autoincrement())
+  text                     String?
+  post_id                  Int?
+  created_on               DateTime? @db.Timestamp(6)
+  logical_delete_indicator Boolean?
+  author_id                Int?
+  USERS                    USERS?    @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_author")
+  POSTS                    POSTS?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
+}
+
+model SCHOOLS {
+  id           Int     @id @default(autoincrement())
+  name         String?
+  abbreviation String?
+  state_id     Int?
+  POSTS        POSTS[]
+  STATES       STATES? @relation(fields: [state_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model STATES {
+  id           Int       @id @default(autoincrement())
+  name         String?
+  abbreviation String?
+  SCHOOLS      SCHOOLS[]
+}
+
+model USERS {
+  id       Int          @id @default(autoincrement())
+  ip       String?      @db.Inet
+  status   user_status?
+  DISLIKES DISLIKES[]
+  LIKES    LIKES[]
+  POSTS    POSTS[]
+  REPORTS  REPORTS[]
+}
+
+model flyway_schema_history {
+  installed_rank Int      @id(map: "flyway_schema_history_pk")
+  version        String?  @db.VarChar(50)
+  description    String   @db.VarChar(200)
+  type           String   @db.VarChar(20)
+  script         String   @db.VarChar(1000)
+  checksum       Int?
+  installed_by   String   @db.VarChar(100)
+  installed_on   DateTime @default(now()) @db.Timestamp(6)
+  execution_time Int
+  success        Boolean
+
+  @@index([success], map: "flyway_schema_history_s_idx")
+}
+
+enum user_status {
+  active
+  inactive
+  banned
+}

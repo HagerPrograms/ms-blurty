@@ -4,18 +4,19 @@ To do list:
 [ ] Create a way to get all reports
 
 --Replies
-[ ] Create a way to like a reply
-[ ] Create a way to create a reply
-[ ] Create a way to dislike a reply
+[X] Create a way to like a reply
+[X] Create a way to create a reply
+[X] Create a way to dislike a reply
+[X] Create a way to create a reply
 
 --Post
+[x] Create a way to create a post
 [x] Create a way to delete a post
 [x] Create a way to get all posts from a school
 [x] Create a way to like a post
 [x] Create a way to dislike a post
-[ ] Create a way to reply to a post
 [x] Create a way to report a post
-[ ] Create a way to create a post
+[X] Create a way to reply to a post
 
 --User
 [ ] Create a way to create a user

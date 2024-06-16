@@ -1,11 +1,16 @@
 import { Router } from 'express';
-import { controller } from './controller';
+import UserController from './controller';
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-    const response = controller()
-    res.send(response)
+router.post('/', async (req, res) => {
+    try{
+        const response = await UserController.CreateUser(req, res)
+        console.log('response:', response)
+        res.send(response)
+    } catch (error){
+        return res.status(500).send({error: `${error}`});
+    }
 });
   
 export default router;

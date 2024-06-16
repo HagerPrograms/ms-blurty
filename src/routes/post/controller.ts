@@ -3,7 +3,7 @@ import prisma from "../../utils/prisma";
 import { response } from "./response";
 
 class PostController {
-    async getPosts(req: Request, res: Response){
+    async GetPosts(req: Request, res: Response){
         const { school } = req.params
         try{
             const posts = prisma.sCHOOLS.findMany({
@@ -24,7 +24,7 @@ class PostController {
         }
     }
 
-    async deletePosts(req: Request, res: Response){
+    async DeletePosts(req: Request, res: Response){
         const { postId } = req.params
         try{
             
@@ -57,8 +57,8 @@ class PostController {
         }
     }
 
-    async createPost(req: Request, res: Response) {
-        const { text, author_ip, school_id, media_url, parent_post_id } = req.body
+    async CreatePost(req: Request, res: Response) {
+        const { text, author_ip, school_id, media_url } = req.body
         try{
             
             let user;
@@ -82,7 +82,6 @@ class PostController {
                     author_id: user?.id ?? null,
                     school_id: school_id,
                     media_url: media_url,
-                    parent_post_id: parent_post_id,
                     logical_delete_indicator: false
                 }
             })
@@ -93,7 +92,7 @@ class PostController {
         }
     }
 
-    async reactToPosts(req: Request, res: Response) {
+    async ReactToPosts(req: Request, res: Response) {
         
         const reactor_ip: string = req.body.reactor_ip
         const likes: number[] = req.body.likes
@@ -139,7 +138,7 @@ class PostController {
         }
     }
 
-    async reportPost(req: Request, res: Response) {
+    async ReportPost(req: Request, res: Response) {
         
         const reporter_ip: string = req.body.reporter_ip
         const text: string = req.body.text

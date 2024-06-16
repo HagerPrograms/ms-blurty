@@ -6,7 +6,7 @@ const router = Router();
 //get posts for a school
 router.get('/:school', async (req, res) =>{
     try{
-        const response = await PostController.getPosts(req, res)
+        const response = await PostController.GetPosts(req, res)
         return res.send(response)
     } catch (error){
         return res.status(500).send({error: `${error}`});
@@ -16,7 +16,7 @@ router.get('/:school', async (req, res) =>{
 //delete a post
 router.delete('/:postId', async (req, res) => {
     try{
-        const response = await PostController.deletePosts(req, res)
+        const response = await PostController.DeletePosts(req, res)
         return res.send(response)
     } catch (error){
         return res.status(500).send({error: `${error}`});
@@ -26,7 +26,7 @@ router.delete('/:postId', async (req, res) => {
 //create a post
 router.post('/', async (req, res) => {
     try{
-        const response = await PostController.createPost(req, res)
+        const response = await PostController.CreatePost(req, res)
         return res.send(response)
     } catch (error){
         return res.status(500).send({error: `${error}`});
@@ -37,7 +37,7 @@ router.post('/', async (req, res) => {
 //react a post
 router.post('/react', async (req, res) => {
     try{
-        const response = await PostController.reactToPosts(req, res)
+        const response = await PostController.ReactToPosts(req, res)
         return res.send(response)
     } catch (error){
         return res.status(500).send({error: `${error}`});
@@ -46,28 +46,11 @@ router.post('/react', async (req, res) => {
 
 router.post('/report/:postId', async (req, res) => {
     try{
-        const response = await PostController.reportPost(req, res)
+        const response = await PostController.ReportPost(req, res)
         return res.send(response)
     } catch (error){
         return res.status(500).send({error: `${error}`});
     }
 } )
-
-
-
-//dislike a post
-// router.post('/dislike', async (req, res) => {
-//     try{
-//         const response = await PostController.dislikePosts(req, res)
-//         return res.send(response)
-//     } catch (error){
-//         return res.status(500).send({error: `${error}`});
-//     }
-// });
-
-// router.post('/', async (req, res) => {
-//     const response = controller()
-//     res.send(response)
-// });
   
 export default router;

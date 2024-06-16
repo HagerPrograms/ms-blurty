@@ -7,37 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model DISLIKES {
-  id      Int    @id @default(autoincrement())
-  user_id Int?
-  post_id Int?
-  POSTS   POSTS? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
-  USERS   USERS? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
-}
-
-model LIKES {
-  id      Int    @id @default(autoincrement())
-  user_id Int?
-  post_id Int?
-  POSTS   POSTS? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
-  USERS   USERS? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
-}
-
 model POSTS {
-  id                       Int        @id @default(autoincrement())
+  id                       Int         @id @default(autoincrement())
   text                     String?
-  created_on               DateTime?  @db.Timestamp(6)
-  media_url                String?
-  logical_delete_indicator Boolean?
+  created_on               DateTime?   @default(now()) @db.Timestamp(6)
+  media_url                String?     @default("")
+  logical_delete_indicator Boolean?    @default(false)
   parent_post_id           Int?
   school_id                Int?
   author_id                Int?
-  DISLIKES                 DISLIKES[]
-  LIKES                    LIKES[]
-  USERS                    USERS?     @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_author")
-  POSTS                    POSTS?     @relation("POSTSToPOSTS", fields: [parent_post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_parent_post")
-  other_POSTS              POSTS[]    @relation("POSTSToPOSTS")
-  SCHOOLS                  SCHOOLS?   @relation(fields: [school_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_school")
+  USERS                    USERS?      @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_author")
+  POSTS                    POSTS?      @relation("POSTSToPOSTS", fields: [parent_post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_parent_post")
+  other_POSTS              POSTS[]     @relation("POSTSToPOSTS")
+  SCHOOLS                  SCHOOLS?    @relation(fields: [school_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_school")
+  REACTIONS                REACTIONS[]
   REPORTS                  REPORTS[]
 }
 
@@ -45,8 +28,8 @@ model REPORTS {
   id                       Int       @id @default(autoincrement())
   text                     String?
   post_id                  Int?
-  created_on               DateTime? @db.Timestamp(6)
-  logical_delete_indicator Boolean?
+  created_on               DateTime? @default(now()) @db.Timestamp(6)
+  logical_delete_indicator Boolean?  @default(false)
   author_id                Int?
   USERS                    USERS?    @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_author")
   POSTS                    POSTS?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
@@ -69,13 +52,12 @@ model STATES {
 }
 
 model USERS {
-  id       Int          @id @default(autoincrement())
-  ip       String?      @db.Inet
-  status   user_status?
-  DISLIKES DISLIKES[]
-  LIKES    LIKES[]
-  POSTS    POSTS[]
-  REPORTS  REPORTS[]
+  id        Int          @id @default(autoincrement())
+  ip        String?      @db.Inet
+  status    user_status?
+  POSTS     POSTS[]
+  REACTIONS REACTIONS[]
+  REPORTS   REPORTS[]
 }
 
 model flyway_schema_history {
@@ -93,8 +75,25 @@ model flyway_schema_history {
   @@index([success], map: "flyway_schema_history_s_idx")
 }
 
+model REACTIONS {
+  id            Int            @id @default(autoincrement())
+  user_id       Int?
+  post_id       Int?
+  reaction_type reaction_type?
+  created_on    DateTime?      @default(now()) @db.Timestamp(6)
+  POSTS         POSTS?         @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
+  USERS         USERS?         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+
+  @@unique([user_id, post_id], map: "unique_user_post")
+}
+
 enum user_status {
   active
   inactive
   banned
+}
+
+enum reaction_type {
+  like
+  dislike
 }

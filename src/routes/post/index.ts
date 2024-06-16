@@ -33,7 +33,6 @@ router.post('/', async (req, res) => {
     }
 });
 
-
 //react a post
 router.post('/react', async (req, res) => {
     try{
@@ -44,6 +43,7 @@ router.post('/react', async (req, res) => {
     }
 });
 
+//report post
 router.post('/report/:postId', async (req, res) => {
     try{
         const response = await PostController.ReportPost(req, res)

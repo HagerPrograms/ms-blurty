@@ -11,8 +11,8 @@ import analytics from "./analytics"
 
 routes.use("/post", post)
 routes.use("/reply", reply)
-routes.use("/report", report)
-routes.use("/school", school)
+routes.use("/reports", report)
+routes.use("/schools", school)
 routes.use("/states", states)
 routes.use("/user", user)
 routes.use("/analytics", analytics)

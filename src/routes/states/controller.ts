@@ -1,7 +1,11 @@
+import { Request, Response } from "express"
+import prisma from "../../utils/prisma"
 import { response } from "./response"
 
-const controller = () => {
-    return response()
+class StatesController {
+    GetStates = async (req: Request, res: Response) => {
+        const states = prisma.sTATES.findMany()
+        return response(states)
+    }
 }
-
-export { controller }
+export default new StatesController

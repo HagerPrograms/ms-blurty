@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { controller } from './controller';
+import StatesController from './controller';
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-    const response = controller()
+    const response = await StatesController.GetStates(req, res)
     res.send(response)
 });
   

@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { controller } from './controller';
+import ReportsController from './controller';
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-    const response = controller()
+    const response = await ReportsController.GetReports(req,res)
     res.send(response)
 });
   

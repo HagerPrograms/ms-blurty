@@ -7,5 +7,15 @@ class SchoolsController {
         const states = prisma.sCHOOLS.findMany()
         return response(states)
     }
+    AddSchool = async (req: Request, res: Response) => {
+        const {name, abbreviation, state_id} = await req.body.body
+        const states = prisma.sCHOOLS.create({
+            data: {
+                name: name,
+                abbreviation: abbreviation,
+                state_id: state_id
+            }})
+        return response(states)
+    }
 }
 export default new SchoolsController

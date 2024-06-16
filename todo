@@ -1,7 +1,7 @@
 To do list:
 
 --Reports
-[ ] Create a way to get all reports
+[X] Create a way to get all reports
 
 --Replies
 [X] Create a way to like a reply
@@ -19,12 +19,19 @@ To do list:
 [X] Create a way to reply to a post
 
 --User
-[ ] Create a way to create a user
+[X] Create a way to create a user
+
+
+--Schools
+[ ] Create a way to create a school
+[X] Create a way to get all schools
+
+--States
+[X] Create a way to get all states
+[ ] Create a way to create a state -- Might wait on this one.
 
 --Misc
 [ ] Create a way to validate input coming into the service
-[ ] Create a way to create a state
-[ ] Create a way to create a school
 [ ] Create a way to filter traffic via api keys
 
 -_Admin

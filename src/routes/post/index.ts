@@ -43,6 +43,15 @@ router.post('/react', async (req, res) => {
     }
 });
 
+router.post('/unreact', async (req, res) => {
+    try{
+        const response = await PostController.UnreactToPosts(req, res)
+        return res.send(response)
+    } catch (error){
+        return res.status(500).send({error: `${error}`});
+    }
+});
+
 //report post
 router.post('/report/:postId', async (req, res) => {
     try{

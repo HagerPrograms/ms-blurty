@@ -137,7 +137,23 @@ class PostController {
             throw new Error(`Failed to like post.`)
         }
     }
+    async UnreactToPosts(req: Request, res: Response) {
+        const user_id = Number(req.body.user_id)
+        const post_ids: number[] = req.body.post_ids
+        try{
 
+            const unreactToPost = await prisma.rEACTIONS.deleteMany({
+                where:{
+                    user_id: user_id,
+                    post_id: {in: post_ids}
+                }
+            })
+
+            return response(unreactToPost)
+        } catch (error) {
+            throw new Error(`Failed to like post.`)
+        }
+    }
     async ReportPost(req: Request, res: Response) {
         
         const reporter_ip: string = req.body.reporter_ip

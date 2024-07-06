@@ -1,7 +1,7 @@
 import Joi from "joi"
 
 
-const getPostsValidation = {
+export const getPostsValidation = {
     params: Joi.object({
         school: Joi.string().required()
     })

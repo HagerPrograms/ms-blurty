@@ -1,10 +1,21 @@
 import { Router } from 'express';
 import PostController from './controller';
-
+import { validate } from 'express-validation' 
+import { getPostsValidation } from '../../validations/post';
 const router = Router();
 
+//create a post
+router.post('/', validate(getPostsValidation), async (req, res) => {
+    try{
+        const response = await PostController.CreatePost(req, res)
+        return res.send(response)
+    } catch (error){
+        return res.status(500).send({error: `${error}`});
+    }
+});
+
 //get posts for a school
-router.get('/:school', async (req, res) =>{
+router.get('/:school', validate(getPostsValidation), async (req, res) =>{
     try{
         const response = await PostController.GetPosts(req, res)
         return res.send(response)
@@ -23,16 +34,6 @@ router.delete('/:postId', async (req, res) => {
     }
 });
 
-//create a post
-router.post('/', async (req, res) => {
-    try{
-        const response = await PostController.CreatePost(req, res)
-        return res.send(response)
-    } catch (error){
-        return res.status(500).send({error: `${error}`});
-    }
-});
-
 //react a post
 router.post('/react', async (req, res) => {
     try{
@@ -43,6 +44,7 @@ router.post('/react', async (req, res) => {
     }
 });
 
+//unreact
 router.post('/unreact', async (req, res) => {
     try{
         const response = await PostController.UnreactToPosts(req, res)

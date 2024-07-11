@@ -79,7 +79,7 @@ class PostController {
             const post = await prisma.pOSTS.create({
                 data: {
                     text: text,
-                    author_id: user?.id ?? null,
+                    author_id: user.id,
                     school_id: school_id,
                     media_url: media_url,
                     logical_delete_indicator: false
@@ -88,13 +88,13 @@ class PostController {
 
             return response(post)
         } catch (error) {
-            throw new Error(`Failed to create post.`)
+            throw error
         }
     }
 
     async ReactToPosts(req: Request, res: Response) {
         
-        const reactor_ip: string = req.body.reactor_ip
+        const user_ip: string = req.body.reactor_ip
         const likes: number[] = req.body.likes
         const dislikes: number[] = req.body.dislikes
 
@@ -103,14 +103,14 @@ class PostController {
             let user;
             user = await prisma.uSERS.findFirst({
                 where: {
-                    ip: reactor_ip
+                    ip: user_ip
                 }
             })
 
             if(!user){
                 user = await prisma.uSERS.create({
                     data: {
-                        ip: reactor_ip
+                        ip: user_ip
                     }
                 })
             }
@@ -138,13 +138,28 @@ class PostController {
         }
     }
     async UnreactToPosts(req: Request, res: Response) {
-        const user_id = Number(req.body.user_id)
+        const reactor_ip: string = req.body.reactor_ip
         const post_ids: number[] = req.body.post_ids
         try{
 
+            let user;
+            user = await prisma.uSERS.findFirst({
+                where: {
+                    ip: reactor_ip
+                }
+            })
+
+            if(!user){
+                user = await prisma.uSERS.create({
+                    data: {
+                        ip: reactor_ip
+                    }
+                })
+            }
+
             const unreactToPost = await prisma.rEACTIONS.deleteMany({
                 where:{
-                    user_id: user_id,
+                    user_id: user.id,
                     post_id: {in: post_ids}
                 }
             })

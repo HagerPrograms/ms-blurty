@@ -5,7 +5,7 @@ import prisma from "../utils/prisma";
 
 const user = async (req: Request, res: Response, next: NextFunction) => {
     let user;
-    const user_ip: string = req.body.user_ip
+    const user_ip: string = req.body.ip
 
     const userType = 
     req.headers.apikey === process.env['MS-BLURTY-ADMIN-APIKEY'] ? 'ADMIN' : 
@@ -31,12 +31,14 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
     if(userType === "UNAUTHORIZED"){
         return res.status(401).send({error: "Access to this api has been denied."})
     }
+
+    if(user.status === "banned"){
+        return res.status(401).send({error: "This user has been banned."})
+    }
     
     req.user = {
         user_id: user.id,
         user_type: userType,
-        user_status: user.status === "banned" ? "BANNED" : "OK"
-
     }
 
     return next()

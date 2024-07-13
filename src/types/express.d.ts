@@ -6,7 +6,6 @@ declare global {
       user?: {
         user_id: number;
         user_type: "USER" | "ADMIN" | "UNAUTHORIZED";
-        user_status: string;
       };
     }
   }

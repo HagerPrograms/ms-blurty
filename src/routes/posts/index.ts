@@ -2,6 +2,7 @@ import { Router } from 'express';
 import PostController from './controller';
 import { validate } from 'express-validation' 
 import { createPostValidation, getPostsValidation, createReplyValidation, deletePost } from '../../validations/post';
+import { admin } from '../../middleware/admin';
 const router = Router();
 
 //create a post
@@ -23,7 +24,6 @@ router.post('/reply', validate(createReplyValidation), async (req, res) => {
         return res.status(500).send({error: `${error}`});
     }
 });
-
 //get posts for a school
 router.get('/:school', validate(getPostsValidation), async (req, res) =>{
     try{
@@ -33,9 +33,8 @@ router.get('/:school', validate(getPostsValidation), async (req, res) =>{
         return res.status(500).send({error: `${error}`});
     }
 });
-
 //delete a post
-router.delete('/:post_id', validate(deletePost), async (req, res) => {
+router.delete('/:post_id', admin, validate(deletePost), async (req, res) => {
     try{
         const response = await PostController.DeletePosts(req, res)
         return res.send(response)
@@ -65,7 +64,7 @@ router.post('/unreact', async (req, res) => {
 });
 
 //report post
-router.post('/report/:postId', async (req, res) => {
+router.post('/report/:post_id', async (req, res) => {
     try{
         const response = await PostController.ReportPost(req, res)
         return res.send(response)

@@ -25,28 +25,25 @@ class PostController {
 
     //deleted array and failed to delete array
     async DeletePosts(req: Request, res: Response){
-        const { postId } = req.params
-        if(req.user?.role !== 'ADMIN'){
-            throw new Error('Unauthorized to delete posts.')
-        }
+        const { post_id } = req.params
         try{
             const post = await prisma.pOSTS.findUnique({
                 where: {
-                    id: Number(postId)
+                    id: Number(post_id)
                 }
             })
     
             if (!post) {
-                throw new Error(`Post not found: ${postId}`)
+                throw new Error(`Post not found: ${post_id}`)
             }
 
             if (post.logical_delete_indicator === true) {
-                throw new Error(`Post already deleted: ${postId}`)
+                throw new Error(`Post already deleted: ${post_id}`)
             }
             
             const posts = prisma.pOSTS.update({
                 where: {
-                    id: Number(postId)
+                    id: Number(post_id)
                 },
                 data: {
                     logical_delete_indicator: true
@@ -55,7 +52,7 @@ class PostController {
 
             return response(posts)
         } catch (error) {
-            throw new Error(`Failed to delete post: ${postId}`)
+            throw new Error(`Failed to delete post: ${post_id}`)
         }
     }
 

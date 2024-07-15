@@ -6,6 +6,8 @@ import { admin } from '../../middleware/admin';
 const router = Router();
 
 //create a post
+
+//should add bulk support where possible
 router.post('/', validate(createPostValidation), async (req, res) => {
     try{
         const response = await PostController.CreatePost(req, res)
@@ -34,7 +36,7 @@ router.get('/:school', validate(getPostsValidation), async (req, res) =>{
     }
 });
 //delete a post
-router.delete('/:post_id', admin, validate(deletePost), async (req, res) => {
+router.delete('/', admin, validate(deletePost), async (req, res) => {
     try{
         const response = await PostController.DeletePosts(req, res)
         return res.send(response)

@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import prisma from "../../utils/prisma";
 import { response } from "./response";
+import { exist } from "joi";
 
 class PostController {
     async GetPosts(req: Request, res: Response) {
@@ -25,34 +26,46 @@ class PostController {
 
     //deleted array and failed to delete array
     async DeletePosts(req: Request, res: Response){
-        const { post_id } = req.params
+        const { post_ids } = req.body
         try{
-            const post = await prisma.pOSTS.findUnique({
+            const existingPosts = await prisma.pOSTS.findMany({
                 where: {
-                    id: Number(post_id)
+                    id: {in: post_ids}
                 }
             })
-    
-            if (!post) {
-                throw new Error(`Post not found: ${post_id}`)
-            }
+            const postsToBeDeleted: number[] = []
+            const postsAlreadyDeleted: number[] = []
 
-            if (post.logical_delete_indicator === true) {
-                throw new Error(`Post already deleted: ${post_id}`)
-            }
-            
-            const posts = prisma.pOSTS.update({
+            existingPosts.forEach((post) => {
+                if(post.logical_delete_indicator === false){
+                    postsToBeDeleted.push(post.id)
+                }
+                if(post.logical_delete_indicator === true){
+                    postsAlreadyDeleted.push(post.id)
+                }
+            })
+
+            const postsAccountedFor = new Set(postsAlreadyDeleted.concat(postsAlreadyDeleted))
+            const postsUnaccountedFor = post_ids.filter((post: number) => !postsAccountedFor.has(post))
+
+
+            const posts = await prisma.pOSTS.updateMany({
                 where: {
-                    id: Number(post_id)
+                    id: {in: postsToBeDeleted},
                 },
                 data: {
                     logical_delete_indicator: true
                 }
             })
 
-            return response(posts)
+            return response({
+                postsToBeDeleted: postsToBeDeleted,
+                postsAlreadyDeleted: postsAlreadyDeleted,
+                postsUnaccountedFor,
+                numberOfDeletions: posts.count
+            })
         } catch (error) {
-            throw new Error(`Failed to delete post: ${post_id}`)
+            throw new Error(`Failed to delete post: ${post_ids}`)
         }
     }
 

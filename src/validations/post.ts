@@ -18,10 +18,11 @@ export const createPostValidation = {
 
 export const deletePost = {
     params: Joi.object({
-        post_id: Joi.string().required(),
+
     }),
     body: Joi.object({
-        ip: Joi.string().required()
+        ip: Joi.string().required(),
+        post_ids: Joi.array().items(Joi.number())
     })
 }
 

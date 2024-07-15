@@ -4,9 +4,9 @@ import prisma from "../utils/prisma";
 
 
 const user = async (req: Request, res: Response, next: NextFunction) => {
-    let user;
     const user_ip: string = req.body.ip
-
+try{
+    let user;
     const userType = 
     req.headers.apikey === process.env['MS-BLURTY-ADMIN-APIKEY'] ? 'ADMIN' : 
         req.headers.apikey === process.env['MS-BLURTY-USER-APIKEY'] ? 'USER' : 
@@ -42,6 +42,10 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     return next()
+}
+catch (error){
+    return res.status(400).send({error: `Unable to locate user: ${req.body.ip}`, })
+}
     
 }
 export { user }

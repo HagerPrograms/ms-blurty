@@ -7,9 +7,9 @@ import { user } from './middleware/user'
 require('dotenv').config()
 
 app.use(express.json())
-app.use(errorHandler)
 app.use(user)
 app.use('/', routes)
+app.use(errorHandler)
 
 //create user middleware with cache
 

@@ -1,8 +1,8 @@
 import express from 'express'
 const routes = express()
 
-import post from "./post"
-import reply from "./reply"
+import post from "./posts"
+import reply from "./replies"
 import report from "./reports"
 import school from "./schools"
 import states from "./states"

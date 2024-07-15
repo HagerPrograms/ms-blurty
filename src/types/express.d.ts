@@ -3,9 +3,9 @@ import { Request } from 'express';
 declare global {
   namespace Express {
     interface Request {
-      user?: {
-        user_id: number;
-        user_type: "USER" | "ADMIN" | "UNAUTHORIZED";
+      user: {
+        id: number;
+        role: "USER" | "ADMIN" | "UNAUTHORIZED";
       };
     }
   }

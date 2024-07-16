@@ -124,32 +124,76 @@ class PostController {
     }
     async ReactToPosts(req: Request, res: Response) {
         
-        const {id} = req.user
-        const likes: number[] = req.body.likes
-        const dislikes: number[] = req.body.dislikes
+        const { id } = req.user
+        const likes: number[] = req.body.likes ?? []
+        const dislikes: number[] = req.body.dislikes ?? []
 
         try{
 
-            const reactions = likes.map((like) => {
+            const likedPosts = await prisma.rEACTIONS.findMany({
+                where: {
+                    user_id: id,
+                    post_id: {in: likes},
+                }
+            })
+
+            const dislikedPosts = await prisma.rEACTIONS.findMany({
+                where: {
+                    user_id: id,
+                    post_id: {in: dislikes},
+                }
+            })
+
+            const existingPosts = new Set(dislikedPosts.concat(likedPosts).map(post => post.post_id))
+            const nonexistingLikes = likes?.filter(like => !existingPosts.has(like)) ?? []
+            const nonexistingDislikes = dislikes?.filter(dislike => !existingPosts.has(dislike)) ?? []
+
+            const reactions = nonexistingLikes.map((like) => {
                 return {
                     reaction_type: 'like' as "dislike" | "like",
                     post_id: like,
-                    id
+                    user_id: id
                 }
-            }).concat(dislikes.map((dislike) => {
+
+            }).concat(nonexistingDislikes.map((dislike) => {
                 return {
                     reaction_type: 'dislike' as "dislike" | "like",
                     post_id: dislike,
-                    id
+                    user_id: id
                 }
             }))
 
+            //create reaction type for user for posts liked/disliked not previously in database.
             const post = await prisma.rEACTIONS.createMany({
                 data: reactions
             })
-            return response(post)
+
+            //modify records in database previously liked/disliked but changed.
+            const modifiedLikedPosts = await prisma.rEACTIONS.updateMany({
+                where: {
+                    id: {in: likedPosts.map((post) => {return post.id})},
+                },
+                data: {
+                    reaction_type: 'like'
+                }
+            })
+
+            const modifiedDislikedPosts = await prisma.rEACTIONS.updateMany({
+                where: {
+                    id: {in: dislikedPosts.map((post) => {return post.id})},
+                },
+                data: {
+                    reaction_type: 'dislike'
+                }
+            })
+
+            return response({
+                newlyCreatedReactions: post.count, 
+                modifiedDislikedPosts: modifiedDislikedPosts.count, 
+                modifiedLikedPosts: modifiedLikedPosts.count
+            })
         } catch (error) {
-            throw new Error(`Failed to like post.`)
+            throw error
         }
     }
     async UnreactToPosts(req: Request, res: Response) {
@@ -179,11 +223,9 @@ class PostController {
                 data: {
                     text: text,
                     author_id: id,
-                    post_id:post_id,
-
+                    post_id:post_id
                 }
             })
-
             return response(post)
         } catch (error) {
             throw new Error(`Failed to like post.`)

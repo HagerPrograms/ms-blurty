@@ -35,7 +35,8 @@ export const createReplyValidation = {
         text: Joi.string().required(),
         ip: Joi.string().required(),
         school_id: Joi.number().required(),
-        media_url: Joi.string().allow(null)
+        media_url: Joi.string().allow(null),
+        parent_post_id: Joi.number().required(),
     })
 }
 

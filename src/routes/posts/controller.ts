@@ -1,24 +1,32 @@
 import { Request, Response } from "express"
 import prisma from "../../utils/prisma";
-import { response } from "./response";
-import { exist } from "joi";
+import { getPostsResponse, response } from "./response";
+import { GetPostsResponse } from "../types/api";
 
 class PostController {
     async GetPosts(req: Request, res: Response) {
         const { school } = req.params
         try{
-            const posts = prisma.sCHOOLS.findMany({
+            const posts = (await prisma.sCHOOLS.findMany({
                 where: {
                     abbreviation: school
                 },
                 include: {
                     POSTS: {
+                        where: {
+                            parent_post_id: null
+                        },
                         include: {
-                        }
-                    }
+                            REACTIONS: true,
+                            other_POSTS: {
+                                include: {
+                                    REACTIONS: true
+                                }
+                            }
+                    }}
                 }
-            })
-            return response(posts)
+            })) as unknown as GetPostsResponse[]
+            return getPostsResponse(posts)
         } catch (error) {
             throw new Error(`Failed fetching data for school: ${school}`)
         }
@@ -89,7 +97,7 @@ class PostController {
         }
     }
     CreateReply = async (req: Request, res: Response) => {
-        const { text, author_ip, school_id, media_url, parent_post_id } = req.body
+        const { text, school_id, media_url, parent_post_id } = req.body
         try{
             if(!parent_post_id){
                 throw new Error(`parent_post_id required!`)
@@ -101,6 +109,8 @@ class PostController {
                     logical_delete_indicator: false
                 }
             })
+
+            console.log(parent_post)
 
             if(!parent_post){
                 throw new Error(`Parent post not found!`)
@@ -123,7 +133,7 @@ class PostController {
         }
     }
     async ReactToPosts(req: Request, res: Response) {
-        
+        //three cases - post exists (no reactions), post exists (has reactions), post doesn't exist
         const { id } = req.user
         const likes: number[] = req.body.likes ?? []
         const dislikes: number[] = req.body.dislikes ?? []
@@ -148,6 +158,12 @@ class PostController {
             const nonexistingLikes = likes?.filter(like => !existingPosts.has(like)) ?? []
             const nonexistingDislikes = dislikes?.filter(dislike => !existingPosts.has(dislike)) ?? []
 
+            const posts = new Set((await prisma.pOSTS.findMany({
+                where: {
+                    id: {in: likes.concat(dislikes)}
+                }
+            })).map(post => post.id))
+
             const reactions = nonexistingLikes.map((like) => {
                 return {
                     reaction_type: 'like' as "dislike" | "like",
@@ -161,7 +177,7 @@ class PostController {
                     post_id: dislike,
                     user_id: id
                 }
-            }))
+            })).filter((reaction) => posts.has(reaction.post_id))
 
             //create reaction type for user for posts liked/disliked not previously in database.
             const post = await prisma.rEACTIONS.createMany({
@@ -200,6 +216,7 @@ class PostController {
         const { id } = req.user
         const post_ids: number[] = req.body.post_ids
         try{
+
             const unreactToPost = await prisma.rEACTIONS.deleteMany({
                 where:{
                     user_id: id,
@@ -207,7 +224,7 @@ class PostController {
                 }
             })
 
-            return response(unreactToPost)
+            return response({message: `Unreacted to ${unreactToPost.count} posts.`})
         } catch (error) {
             throw new Error(`Failed to like post.`)
         }
@@ -223,12 +240,12 @@ class PostController {
                 data: {
                     text: text,
                     author_id: id,
-                    post_id:post_id
+                    post_id: post_id
                 }
             })
-            return response(post)
+            return response({message: "Reported post: " + post_id})
         } catch (error) {
-            throw new Error(`Failed to like post.`)
+            throw new Error(`Failed to report post.`)
         }
     }
 }

@@ -20,7 +20,7 @@ router.post('/', validate(createPostValidation), async (req, res) => {
 //create a post
 router.post('/reply', validate(createReplyValidation), async (req, res) => {
     try{
-        const response = await PostController.CreatePost(req, res)
+        const response = await PostController.CreateReply(req, res)
         return res.send(response)
     } catch (error){
         return res.status(500).send({error: `${error}`});

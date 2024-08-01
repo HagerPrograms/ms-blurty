@@ -26,7 +26,6 @@ class UserController {
 
     BanUser = async (req: Request, _res: Response) => {
         let user;
-
         user = await prisma.uSERS.update({
             where: {
                 id: req.body.user_id,

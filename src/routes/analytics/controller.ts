@@ -1,7 +1,7 @@
+import { Request, Response } from "express"
+import prisma from "../../utils/prisma"
 import { response } from "./response"
 
-const controller = () => {
-    return response()
+class AnalyticsController {
 }
-
-export { controller }
+export default new AnalyticsController

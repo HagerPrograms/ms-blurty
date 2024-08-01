@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import SchoolsController from './controller';
+import { admin } from '../../middleware/admin';
 
 const router = Router();
 
@@ -12,7 +13,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/add', async (req, res) => {
+router.post('/add', admin, async (req, res) => {
     try{
         const response = await SchoolsController.AddSchool(req, res)
         res.send(response)
@@ -21,7 +22,7 @@ router.post('/add', async (req, res) => {
     }
 });
 
-router.post('/remove', async (req, res) => {
+router.post('/remove', admin, async (req, res) => {
     try{
         const response = await SchoolsController.RemoveSchool(req, res)
         res.send(response)

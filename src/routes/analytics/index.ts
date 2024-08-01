@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { controller } from './controller';
+import AnalyticsController from './controller';
 
 const router = Router();
 

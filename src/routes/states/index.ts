@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import StatesController from './controller';
+import { admin } from '../../middleware/admin';
 
 const router = Router();
 
@@ -12,7 +13,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/create', async (req, res) => {
+router.post('/create', admin ,async (req, res) => {
     try{
         const response = await StatesController.AddState(req, res)
         res.send(response)
@@ -21,7 +22,7 @@ router.post('/create', async (req, res) => {
     }
 });
 
-router.delete('/delete', async (req, res) => {
+router.delete('/delete', admin, async (req, res) => {
     try{
         const response = await StatesController.RemoveState(req, res)
         res.send(response)

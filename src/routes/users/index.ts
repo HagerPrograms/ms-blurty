@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import UserController from './controller';
+import { admin } from '../../middleware/admin';
 
 const router = Router();
 
@@ -12,7 +13,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/ban', async (req, res) => {
+router.post('/ban', admin, async (req, res) => {
     try{
         const response = await UserController.BanUser(req, res)
         res.send(response)
@@ -21,7 +22,7 @@ router.post('/ban', async (req, res) => {
     }
 })
 
-router.post('/unban', async (req, res) => {
+router.post('/unban', admin, async (req, res) => {
     try{
         const response = await UserController.unbanUser(req, res)
         res.send(response)

@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import ReportsController from './controller';
+import { admin } from '../../middleware/admin';
 
 const router = Router();
 
-router.get('/', async (req, res) => {
+router.get('/', admin, async (req, res) => {
     try{
         const response = await ReportsController.GetReports(req,res)
         res.send(response)
@@ -12,7 +13,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/resolveAll', async (req, res) => {
+router.get('/resolveAll', admin, async (req, res) => {
     try{
         const response = await ReportsController.ResolveAllReports(req,res)
         res.send(response)
@@ -21,7 +22,7 @@ router.get('/resolveAll', async (req, res) => {
     }
 });
 
-router.get('/resolveOne', async (req, res) => {
+router.get('/resolveOne', admin, async (req, res) => {
     try{
         const response = await ReportsController.ResolveOneReport(req,res)
         res.send(response)

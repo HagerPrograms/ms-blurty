@@ -11,5 +11,23 @@ router.get('/', async (req, res) => {
         return res.status(500).send({error: `${error}`});
     }
 });
+
+router.post('/create', async (req, res) => {
+    try{
+        const response = await StatesController.AddState(req, res)
+        res.send(response)
+    } catch (error){
+        return res.status(500).send({error: `${error}`});
+    }
+});
+
+router.delete('/delete', async (req, res) => {
+    try{
+        const response = await StatesController.RemoveState(req, res)
+        res.send(response)
+    } catch (error){
+        return res.status(500).send({error: `${error}`});
+    }
+});
   
 export default router;

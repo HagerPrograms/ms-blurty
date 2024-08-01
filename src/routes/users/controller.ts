@@ -23,6 +23,36 @@ class UserController {
 
         return response(user)
     }
+
+    BanUser = async (req: Request, _res: Response) => {
+        let user;
+
+        user = await prisma.uSERS.update({
+            where: {
+                id: req.body.user_id,
+              },
+              data: {
+                status: 'banned'
+              },
+        })
+
+        return response(user)
+    }
+
+    unbanUser = async (req: Request, _res: Response) => {
+        let user;
+
+        user = await prisma.uSERS.update({
+            where: {
+                id: req.body.user_id,
+              },
+              data: {
+                status: 'active'
+              },
+        })
+
+        return response(user)
+    }
 }
 
 export default new UserController

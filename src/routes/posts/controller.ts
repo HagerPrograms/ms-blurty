@@ -14,13 +14,17 @@ class PostController {
                 include: {
                     POSTS: {
                         where: {
-                            parent_post_id: null
+                            parent_post_id: null,
+                            logical_delete_indicator: false
                         },
                         include: {
                             REACTIONS: true,
                             other_POSTS: {
                                 include: {
                                     REACTIONS: true
+                                },
+                                where: {
+                                    logical_delete_indicator: false
                                 }
                             }
                     }}
@@ -109,8 +113,6 @@ class PostController {
                     logical_delete_indicator: false
                 }
             })
-
-            console.log(parent_post)
 
             if(!parent_post){
                 throw new Error(`Parent post not found!`)

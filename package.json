@@ -32,7 +32,9 @@
     "start": "node dist/app.js",
     "dev": "nodemon",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "prisma:pull": "prisma db pull",
+    "prisma:generate": "prisma generate"
   },
   "repository": {
     "type": "git",

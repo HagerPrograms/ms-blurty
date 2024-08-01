@@ -31,6 +31,7 @@ model REPORTS {
   created_on               DateTime? @default(now()) @db.Timestamp(6)
   logical_delete_indicator Boolean?  @default(false)
   author_id                Int?
+  resolved                 Boolean?  @default(false)
   USERS                    USERS?    @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_author")
   POSTS                    POSTS?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post")
 }
@@ -96,4 +97,9 @@ enum user_status {
 enum reaction_type {
   like
   dislike
+}
+
+enum report_status {
+  outstanding
+  resolved
 }

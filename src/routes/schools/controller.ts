@@ -17,5 +17,14 @@ class SchoolsController {
             }})
         return response(states)
     }
+    RemoveSchool = async (req: Request, res: Response) => {
+        const {id} = await req.body
+        const states = prisma.sCHOOLS.delete({
+            where: {
+                id:  id
+            }
+        })
+        return response(states)
+    }
 }
 export default new SchoolsController

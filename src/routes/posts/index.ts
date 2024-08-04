@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import PostController from './controller';
 import { validate } from 'express-validation' 
-import { createPostValidation, getPostsValidation, createReplyValidation, deletePost } from '../../validations/post';
+import { createPostValidation, getPostsValidation, createReplyValidation, deletePost } from '../../validations/posts';
 import { admin } from '../../middleware/admin';
 const router = Router();
 

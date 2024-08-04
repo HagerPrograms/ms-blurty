@@ -18,7 +18,6 @@ export const createPostValidation = {
 
 export const deletePost = {
     params: Joi.object({
-
     }),
     body: Joi.object({
         ip: Joi.string().required(),
@@ -26,8 +25,24 @@ export const deletePost = {
     })
 }
 
-export const reactToAPost = {
-    
+export const unreactToPostsValidation = {
+    body: Joi.object({
+        post_ids: Joi.array().items(Joi.number())
+    })
+}
+
+export const reactToPostsValidation = {
+    body: Joi.object({
+        likes: Joi.array().items(Joi.number()),
+        dislikes: Joi.array().items(Joi.number()),
+    })
+}
+
+export const createReportValidation = {
+    body: Joi.object({
+        text: Joi.string().required(),
+        post_id: Joi.number().required()
+    })
 }
 
 export const createReplyValidation = {
@@ -41,7 +56,9 @@ export const createReplyValidation = {
 }
 
 //react to a post
-
 //unreact to a post
-
+//report post
+//create a post
+//react a post
+//unreact
 //report post

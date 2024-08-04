@@ -1,5 +1,5 @@
 import { reaction_type } from '@prisma/client'
-import {GetPostsResponse, Post} from '../types/api'
+import {GetPostsResponse, Post} from '../../utils/types/api'
 
 const response = (posts: any) => {
     return posts

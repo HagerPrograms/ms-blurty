@@ -4,27 +4,41 @@ import { response } from "./response"
 
 class SchoolsController {
     GetSchools = async (req: Request, res: Response) => {
-        const states = prisma.sCHOOLS.findMany()
-        return response(states)
+        try {
+            const states = prisma.sCHOOLS.findMany()
+            return response(states)
+        } catch {
+            throw new Error("Failed to /GET schools.")
+        }
     }
-    AddSchool = async (req: Request, res: Response) => {
-        const {name, abbreviation, state_id} = await req.body.body
-        const states = prisma.sCHOOLS.create({
-            data: {
-                name: name,
-                abbreviation: abbreviation,
-                state_id: state_id
-            }})
-        return response(states)
+    CreateSchool = async (req: Request, res: Response) => {
+        try {
+            const {name, abbreviation, state_id} = await req.body.body
+            const states = prisma.sCHOOLS.create({
+                data: {
+                    name: name,
+                    abbreviation: abbreviation,
+                    state_id: state_id
+                }})
+            return response(states)
+        } catch {
+            throw new Error("Failed to create school.")
+        }
+
     }
-    RemoveSchool = async (req: Request, res: Response) => {
-        const {id} = await req.body
-        const states = prisma.sCHOOLS.delete({
-            where: {
-                id:  id
-            }
-        })
-        return response(states)
+    DeleteSchool = async (req: Request, res: Response) => {
+        try{
+            const {id} = await req.body
+            const states = prisma.sCHOOLS.delete({
+                where: {
+                    id:  id
+                }
+            })
+            return response(states)
+        } catch {
+            throw new Error("Failed to delete school.")
+        }
+
     }
 }
 export default new SchoolsController

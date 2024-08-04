@@ -23,20 +23,22 @@ To do list:
 
 
 --Schools
-[ ] Create a way to create a school
+[X] Create a way to create a school
 [X] Create a way to get all schools
 
 --States
 [X] Create a way to get all states
-[ ] Create a way to create a state -- Might wait on this one.
+[X] Create a way to create a state -- Might wait on this one.
 
 --Misc
-[ ] Create a way to validate input coming into the service
-[ ] Create a way to filter traffic via api keys
+[ ] Create a way to validate input coming into the service --- WIP
+[X] Create a way to filter traffic via api keys
 
--_Admin
+--Admin
 [ ] Create a way to settle a post (Determine to not be in violation)
-[ ] Create a way to ban a user
-[ ] Create a way to unban a user
+[X] Create a way to ban a user
+[X] Create a way to unban a user
 [ ] Create a way to reinstate a post's media
 [ ] Create a way to remove a post's media
+
+-- Create Validations for 

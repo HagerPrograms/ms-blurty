@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import UserController from './controller';
 import { admin } from '../../middleware/admin';
+import { unbanUserValidation } from '../../validations/user';
+import { validate } from 'express-validation';
+import { createUserValidation } from '../../validations/user';
+import { banUserValidation } from '../../validations/user';
 
 const router = Router();
 
-router.post('/', async (req, res) => {
+router.post('/', validate(createUserValidation), admin, async (req, res) => {
     try{
         const response = await UserController.CreateUser(req, res)
         res.send(response)
@@ -13,7 +17,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.post('/ban', admin, async (req, res) => {
+router.post('/ban', validate(banUserValidation), admin, async (req, res) => {
     try{
         const response = await UserController.BanUser(req, res)
         res.send(response)
@@ -22,7 +26,7 @@ router.post('/ban', admin, async (req, res) => {
     }
 })
 
-router.post('/unban', admin, async (req, res) => {
+router.post('/unban', validate(unbanUserValidation), admin, async (req, res) => {
     try{
         const response = await UserController.unbanUser(req, res)
         res.send(response)

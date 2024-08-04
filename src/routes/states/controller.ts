@@ -4,29 +4,42 @@ import { response } from "./response"
 
 class StatesController {
     GetStates = async (req: Request, res: Response) => {
-        const states = prisma.sTATES.findMany()
-        return response(states)
+        try{
+            const states = prisma.sTATES.findMany()
+            return response(states)
+        } catch (error) {
+            throw new Error("Failed to /GET states")
+        }
     }
-    AddState = async (req: Request, res: Response) => {
-        const {state_name, state_abbreviation} = req.body
-        const states = prisma.sTATES.create(
-            {data: {
-                abbreviation: state_abbreviation,
-                name: state_name
-            }}
-        )
-        return response(states)
+    CreateState = async (req: Request, res: Response) => {
+        try {
+            const {state_name, state_abbreviation} = req.body
+            const states = prisma.sTATES.create(
+                {data: {
+                    abbreviation: state_abbreviation,
+                    name: state_name
+                }}
+            )
+            return response(states)
+        } catch (error) {
+            throw new Error("Failed to create state")
+        }
     }
-    RemoveState = async (req: Request, res: Response) => {
-        const {state_id} = req.body
-        const states = prisma.sTATES.delete(
-            {
-                where: {
-                    id: state_id
+    DeleteState = async (req: Request, res: Response) => {
+        try{
+            const {state_id} = req.body
+            const states = prisma.sTATES.delete(
+                {
+                    where: {
+                        id: state_id
+                    }
                 }
-            }
-        )
-        return response(states)
+            )
+            return response(states)
+        } catch (error) {
+            throw new Error("Failed to delete state")
+        }
+
     }
 }
 export default new StatesController

@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import prisma from "../../utils/prisma";
 import { getPostsResponse, response } from "./response";
-import { GetPostsResponse } from "../types/api";
+import { GetPostsResponse } from "../../utils/types/api";
 
 class PostController {
     async GetPosts(req: Request, res: Response) {
@@ -134,6 +134,7 @@ class PostController {
             throw error
         }
     }
+    //TODO: rework reactToPosts
     async ReactToPosts(req: Request, res: Response) {
         //three cases - post exists (no reactions), post exists (has reactions), post doesn't exist
         const { id } = req.user

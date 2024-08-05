@@ -27,7 +27,6 @@ class UserController {
             throw new Error("Error creating user.")
         }
     }
-
     BanUser = async (req: Request, _res: Response) => {
         try{
             let user;
@@ -45,7 +44,6 @@ class UserController {
         }
 
     }
-
     unbanUser = async (req: Request, _res: Response) => {
         try{
             let user;
@@ -65,5 +63,3 @@ class UserController {
 }
 
 export default new UserController
-
-//ban user, unban user req.body.user_id,

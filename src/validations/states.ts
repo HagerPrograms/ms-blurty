@@ -11,7 +11,7 @@ export const createStateValidation = {
 export const deleteStateValidation = {
     body: Joi.object({
         ip: Joi.string().required(),
-        state_id: Joi.string().required()
+        state_id: Joi.number().required()
     })
 }
 

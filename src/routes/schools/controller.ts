@@ -13,7 +13,7 @@ class SchoolsController {
     }
     CreateSchool = async (req: Request, res: Response) => {
         try {
-            const {name, abbreviation, state_id} = await req.body.body
+            const {name, abbreviation, state_id} = await req.body
             const states = prisma.sCHOOLS.create({
                 data: {
                     name: name,
@@ -21,7 +21,8 @@ class SchoolsController {
                     state_id: state_id
                 }})
             return response(states)
-        } catch {
+        } catch (error) {
+            console.log(error)
             throw new Error("Failed to create school.")
         }
 

@@ -104,7 +104,7 @@ class PostController {
         const { text, school_id, media_url, parent_post_id } = req.body
         try{
             if(!parent_post_id){
-                throw new Error(`parent_post_id required!`)
+                throw new Error(`parent_post_id required.`)
             }
             
             const parent_post = await prisma.pOSTS.findFirst({
@@ -115,7 +115,7 @@ class PostController {
             })
 
             if(!parent_post){
-                throw new Error(`Parent post not found!`)
+                throw new Error(`Parent post not found.`)
             }
 
             const post = await prisma.pOSTS.create({
@@ -233,11 +233,10 @@ class PostController {
         }
     }
     async ReportPost(req: Request, res: Response) {
-        
         const { id } = req.user
         const text: string = req.body.text
-        const post_id: number = Number(req.params.postId)
-
+        const post_id: number = Number(req.params.post_id)
+        console.log(post_id)
         try{
             const post = await prisma.rEPORTS.create({
                 data: {
@@ -248,6 +247,7 @@ class PostController {
             })
             return response({message: "Reported post: " + post_id})
         } catch (error) {
+            console.log(error)
             throw new Error(`Failed to report post.`)
         }
     }

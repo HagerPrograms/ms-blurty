@@ -8,7 +8,7 @@ class StatesController {
             const states = prisma.sTATES.findMany()
             return response(states)
         } catch (error) {
-            throw new Error("Failed to /GET states")
+            throw new Error("Failed to /GET states.")
         }
     }
     CreateState = async (req: Request, res: Response) => {
@@ -22,7 +22,7 @@ class StatesController {
             )
             return response(states)
         } catch (error) {
-            throw new Error("Failed to create state")
+            throw new Error("Failed to create state.")
         }
     }
     DeleteState = async (req: Request, res: Response) => {
@@ -37,7 +37,7 @@ class StatesController {
             )
             return response(states)
         } catch (error) {
-            throw new Error("Failed to delete state")
+            throw new Error("Failed to delete state.")
         }
 
     }

@@ -4,7 +4,6 @@ import prisma from "../../utils/prisma"
 
 class ReplyController {
     ReactReply = async (req: Request, res: Response) => {
-        const reactor_ip: string = req.body.reactor_ip
         const likes: number[] = req.body.likes
         const dislikes: number[] = req.body.dislikes
 

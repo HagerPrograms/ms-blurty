@@ -24,7 +24,7 @@ router.post('/create', validate(createSchoolValidation), admin, async (req, res)
     }
 });
 
-router.post('/delete', validate(deleteSchoolValidation), admin, async (req, res) => {
+router.delete('/delete', validate(deleteSchoolValidation), admin, async (req, res) => {
     try{
         const response = await SchoolsController.DeleteSchool(req, res)
         res.send(response)

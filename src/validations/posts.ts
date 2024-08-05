@@ -2,9 +2,13 @@ import Joi from "joi"
 
 
 export const getPostsValidation = {
+    body: Joi.object({
+        ip: Joi.string().required(),
+    }),
     params: Joi.object({
         school: Joi.string().required()
     })
+    
 }
 
 export const createPostValidation = {
@@ -27,21 +31,26 @@ export const deletePost = {
 
 export const unreactToPostsValidation = {
     body: Joi.object({
+        ip: Joi.string().required(),
         post_ids: Joi.array().items(Joi.number())
     })
 }
 
 export const reactToPostsValidation = {
     body: Joi.object({
+        ip: Joi.string().required(),
         likes: Joi.array().items(Joi.number()),
         dislikes: Joi.array().items(Joi.number()),
     })
 }
 
 export const createReportValidation = {
+    params: Joi.object({
+        post_id: Joi.number().required() 
+    }),
     body: Joi.object({
+        ip: Joi.string().required(),
         text: Joi.string().required(),
-        post_id: Joi.number().required()
     })
 }
 

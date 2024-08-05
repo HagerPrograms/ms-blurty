@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import PostController from './controller';
 import { validate } from 'express-validation' 
-import { createPostValidation, getPostsValidation, createReplyValidation, deletePost } from '../../validations/posts';
+import { createPostValidation, getPostsValidation, createReplyValidation, deletePost, unreactToPostsValidation, reactToPostsValidation, createReportValidation } from '../../validations/posts';
 import { admin } from '../../middleware/admin';
 const router = Router();
 
@@ -46,7 +46,7 @@ router.delete('/', admin, validate(deletePost), async (req, res) => {
 });
 
 //react a post
-router.post('/react', async (req, res) => {
+router.post('/react', validate(reactToPostsValidation), async (req, res) => {
     try{
         const response = await PostController.ReactToPosts(req, res)
         return res.send(response)
@@ -56,7 +56,7 @@ router.post('/react', async (req, res) => {
 });
 
 //unreact
-router.post('/unreact', async (req, res) => {
+router.post('/unreact', validate(unreactToPostsValidation), async (req, res) => {
     try{
         const response = await PostController.UnreactToPosts(req, res)
         return res.send(response)
@@ -66,7 +66,7 @@ router.post('/unreact', async (req, res) => {
 });
 
 //report post
-router.post('/report/:post_id', async (req, res) => {
+router.post('/report/:post_id', validate(createReportValidation), async (req, res) => {
     try{
         const response = await PostController.ReportPost(req, res)
         return res.send(response)

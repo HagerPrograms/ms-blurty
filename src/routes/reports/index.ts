@@ -13,7 +13,7 @@ router.get('/', admin, async (req, res) => {
     }
 });
 
-router.get('/resolveAll', admin, async (req, res) => {
+router.post('/resolveAll', admin, async (req, res) => {
     try{
         const response = await ReportsController.ResolveAllReports(req,res)
         res.send(response)
@@ -22,9 +22,27 @@ router.get('/resolveAll', admin, async (req, res) => {
     }
 });
 
-router.get('/resolveOne', admin, async (req, res) => {
+router.post('/resolveOne', admin, async (req, res) => {
     try{
         const response = await ReportsController.ResolveOneReport(req,res)
+        res.send(response)
+    } catch (error){
+        return res.status(500).send({error: `${error}`});
+    }
+});
+
+router.post('/unresolveAll', admin, async (req, res) => {
+    try{
+        const response = await ReportsController.unresolveAllReports(req,res)
+        res.send(response)
+    } catch (error){
+        return res.status(500).send({error: `${error}`});
+    }
+});
+
+router.post('/unresolveOne', admin, async (req, res) => {
+    try{
+        const response = await ReportsController.unresolveOneReport(req,res)
         res.send(response)
     } catch (error){
         return res.status(500).send({error: `${error}`});

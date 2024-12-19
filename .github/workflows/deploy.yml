@@ -30,10 +30,10 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > ssh_key
         chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
-        PROJECT_DIR="/path/to/your/project"
+        PROJECT_DIR="/repo"
         if [ ! -d "$PROJECT_DIR" ]; then
           echo "Directory $PROJECT_DIR does not exist. Cloning repository..."
-          git clone https://$GITHUB_PAT@github.com/username/repository.git $PROJECT_DIR
+          git clone https://$GITHUB_PAT@github.com/HagerPrograms/ms-blurty.git $PROJECT_DIR
         else
           echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
           cd $PROJECT_DIR

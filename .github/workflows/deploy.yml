@@ -23,7 +23,7 @@ jobs:
     # Step 3: Deploy to VPS
     - name: Deploy to VPS
       env:
-        GITHUB_PAT: ${{ secrets.PAT }}
+        PAT: ${{ secrets.PAT }}
         VPS_USER: ${{ secrets.VPS_USER }}
         VPS_HOST: ${{ secrets.VPS_HOST }}
         $SSH_PRIVATE_KEY: ${{ secrets.$SSH_PRIVATE_KEY }}

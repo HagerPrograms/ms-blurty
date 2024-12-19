@@ -23,15 +23,23 @@ jobs:
     # Step 3: Deploy to VPS
     - name: Deploy to VPS
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        GITHUB_PAT: ${{ secrets.GITHUB_PAT }}
         VPS_USER: ${{ secrets.VPS_USER }}
         VPS_HOST: ${{ secrets.VPS_HOST }}
       run: |
         echo "$SSH_PRIVATE_KEY" > ssh_key
         chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
-        cd /ms-blurty
+        PROJECT_DIR="/path/to/your/project"
+        if [ ! -d "$PROJECT_DIR" ]; then
+          echo "Directory $PROJECT_DIR does not exist. Cloning repository..."
+          git clone https://$GITHUB_PAT@github.com/username/repository.git $PROJECT_DIR
+        else
+          echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
+          cd $PROJECT_DIR
         git pull origin main
+        fi
+        cd $PROJECT_DIR
         npm install --production
-        pm2 restart all # Adjust to your process manager
+        pm2 restart all
         EOF

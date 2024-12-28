@@ -55,7 +55,7 @@ jobs:
           cd $PROJECT_DIR
         git pull origin main
         cd $PROJECT_DIR
-        nvm use
+        nvm install
         npm install --production
         pm2 restart all
         EOF

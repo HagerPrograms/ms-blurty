@@ -26,7 +26,9 @@ jobs:
         chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh
+        exec bash
         nvm install node
+        exec bash
         npm install -g npm
         EOF
 

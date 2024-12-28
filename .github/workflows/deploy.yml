@@ -56,6 +56,7 @@ jobs:
         git pull origin main
         cd $PROJECT_DIR
         nvm install
+        killall node
         npm install --production
         pm2 restart all
         EOF

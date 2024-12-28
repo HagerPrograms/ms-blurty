@@ -58,6 +58,5 @@ jobs:
         nvm install
         killall node
         npm install --production
-        pm2 restart all
         EOF
         

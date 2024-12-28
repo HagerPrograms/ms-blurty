@@ -21,7 +21,7 @@ jobs:
         node-version: '18'  # Adjust to your Node.js version
 
     # Step 3: Deploy to VPS
-    - name: Deploy to VPS
+    - name: Setup VPS
       env:
         PAT: ${{ secrets.PAT }}
         VPS_USER: ${{ secrets.VPS_USER }}

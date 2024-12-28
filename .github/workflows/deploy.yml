@@ -49,19 +49,37 @@ jobs:
       run: |
         echo "$SSH_PRIVATE_KEY" > ssh_key
         chmod 600 ssh_key
-        ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
+        ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
+        # Define project directory
         PROJECT_DIR="/repo"
+
+        # Load nvm environment
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+        # Check if project directory exists
         if [ ! -d "$PROJECT_DIR" ]; then
           echo "Directory $PROJECT_DIR does not exist. Cloning repository..."
           git clone https://$PAT@github.com/HagerPrograms/ms-blurty.git $PROJECT_DIR
-          cd $PROJECT_DIR
         else
           echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
           cd $PROJECT_DIR
-        git pull origin main
+          git pull origin main
+        fi
+
+        # Navigate to project directory
         cd $PROJECT_DIR
+
+        # Install Node.js via nvm
         nvm install
-        killall node
+
+        # Stop running Node.js processes if any
+        if pgrep node > /dev/null; then
+          echo "Stopping running Node.js processes..."
+          killall node
+        fi
+
+        # Install production dependencies
         npm install --production
         EOF
         

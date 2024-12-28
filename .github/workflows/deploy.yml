@@ -14,13 +14,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Step 2: Set up Node.js
-    - name: Set up VPS
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'  # Adjust to your Node.js version
-
-    # Step 3: Deploy to VPS
+    # Step 2: Deploy to VPS
     - name: Setup VPS
       env:
         PAT: ${{ secrets.PAT }}
@@ -31,10 +25,12 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > ssh_key
         chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh
+        nvm install 22
+        npm install -g npm
         EOF
 
-    # Step 4: Deploy to VPS
+    # Step 3: Deploy to VPS
     - name: Deploy to VPS
       env:
         PAT: ${{ secrets.PAT }}

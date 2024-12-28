@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v3
 
     # Step 2: Set up Node.js
-    - name: Set up Node.js
+    - name: Set up VPS
       uses: actions/setup-node@v3
       with:
         node-version: '18'  # Adjust to your Node.js version
@@ -31,16 +31,31 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > ssh_key
         chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+        EOF
+
+    # Step 4: Deploy to VPS
+    - name: Deploy to VPS
+      env:
+        PAT: ${{ secrets.PAT }}
+        VPS_USER: ${{ secrets.VPS_USER }}
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > ssh_key
+        chmod 600 ssh_key
+        ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << EOF
         PROJECT_DIR="/repo"
         if [ ! -d "$PROJECT_DIR" ]; then
           echo "Directory $PROJECT_DIR does not exist. Cloning repository..."
           git clone https://$PAT@github.com/HagerPrograms/ms-blurty.git $PROJECT_DIR
+          cd $PROJECT_DIR
         else
           echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
           cd $PROJECT_DIR
         git pull origin main
-        fi
         cd $PROJECT_DIR
+        nvm use
         npm install --production
         pm2 restart all
         EOF

@@ -4,7 +4,6 @@ import { validate } from 'express-validation'
 import { createPostValidation, getPostsValidation, createReplyValidation, deletePost, unreactToPostsValidation, reactToPostsValidation, createReportValidation } from '../../validations/posts';
 import { admin } from '../../middleware/admin';
 const router = Router();
-
 //create a post
 
 //should add bulk support where possible
@@ -26,6 +25,7 @@ router.post('/reply', validate(createReplyValidation), async (req, res) => {
         return res.status(500).send({error: `${error}`});
     }
 });
+
 //get posts for a school
 router.get('/:school', validate(getPostsValidation), async (req, res) =>{
     try{
@@ -35,6 +35,7 @@ router.get('/:school', validate(getPostsValidation), async (req, res) =>{
         return res.status(500).send({error: `${error}`});
     }
 });
+
 //delete a post
 router.delete('/', admin, validate(deletePost), async (req, res) => {
     try{

@@ -1,6 +1,5 @@
 import Joi from "joi"
 
-
 export const getPostsValidation = {
     body: Joi.object({
         ip: Joi.string().required(),
@@ -68,6 +67,6 @@ export const createReplyValidation = {
 //unreact to a post
 //report post
 //create a post
+//report post
 //react a post
 //unreact
-//report post

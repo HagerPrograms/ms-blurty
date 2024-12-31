@@ -1,8 +1,4 @@
-// router.get('/',
-// router.get('/resolveAll',
-
 import Joi from "joi"
-
 
 export const getAllReportsValidation = {
     body: Joi.object({

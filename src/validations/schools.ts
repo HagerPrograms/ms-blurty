@@ -1,7 +1,3 @@
-// router.get('/', async (req, res)
-// router.post('/add', admin, async (req, res)
-// router.post('/remove', admin, async (req, res) 
-
 import Joi from "joi"
 
 export const getSchoolsValidation = {

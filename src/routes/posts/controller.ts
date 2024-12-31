@@ -4,7 +4,7 @@ import { getPostsResponse, response } from "./response";
 import { GetPostsResponse } from "../../utils/types/api";
 
 class PostController {
-    async GetPosts(req: Request, res: Response) {
+    async GetPosts(req: Request, _res: Response) {
         const { school } = req.params
         try{
             const posts = (await prisma.sCHOOLS.findMany({
@@ -37,7 +37,7 @@ class PostController {
     }
 
     //deleted array and failed to delete array
-    async DeletePosts(req: Request, res: Response){
+    async DeletePosts(req: Request, _res: Response){
         const { post_ids } = req.body
         try{
             const existingPosts = await prisma.pOSTS.findMany({
@@ -81,7 +81,7 @@ class PostController {
         }
     }
 
-    async CreatePost(req: Request, res: Response) {
+    async CreatePost(req: Request, _res: Response) {
         const { text, school_id, media_url } = req.body
         const {id} = req.user
         try{
@@ -100,7 +100,7 @@ class PostController {
             throw error
         }
     }
-    CreateReply = async (req: Request, res: Response) => {
+    CreateReply = async (req: Request, _res: Response) => {
         const { text, school_id, media_url, parent_post_id } = req.body
         try{
             if(!parent_post_id){
@@ -135,7 +135,7 @@ class PostController {
         }
     }
     //TODO: rework reactToPosts
-    async ReactToPosts(req: Request, res: Response) {
+    async ReactToPosts(req: Request, _res: Response) {
         //three cases - post exists (no reactions), post exists (has reactions), post doesn't exist
         const { id } = req.user
         const likes: number[] = req.body.likes ?? []
@@ -215,7 +215,8 @@ class PostController {
             throw error
         }
     }
-    async UnreactToPosts(req: Request, res: Response) {
+    
+    async UnreactToPosts(req: Request, _res: Response) {
         const { id } = req.user
         const post_ids: number[] = req.body.post_ids
         try{
@@ -232,13 +233,14 @@ class PostController {
             throw new Error(`Failed to like post.`)
         }
     }
-    async ReportPost(req: Request, res: Response) {
+
+    async ReportPost(req: Request, _res: Response) {
         const { id } = req.user
         const text: string = req.body.text
         const post_id: number = Number(req.params.post_id)
-        console.log(post_id)
+
         try{
-            const post = await prisma.rEPORTS.create({
+            await prisma.rEPORTS.create({
                 data: {
                     text: text,
                     author_id: id,
@@ -247,7 +249,6 @@ class PostController {
             })
             return response({message: "Reported post: " + post_id})
         } catch (error) {
-            console.log(error)
             throw new Error(`Failed to report post.`)
         }
     }

@@ -22,7 +22,7 @@ class SchoolsController {
                 }})
             return response(states)
         } catch (error) {
-            console.log(error)
+            
             throw new Error("Failed to create school.")
         }
 

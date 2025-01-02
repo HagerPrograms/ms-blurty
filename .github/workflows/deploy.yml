@@ -53,7 +53,7 @@ jobs:
         chmod 600 ssh_key
         ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
         # Define project directory
-        PROJECT_DIR="/repo"
+        PROJECT_DIR="~/repo"
 
         # Load nvm environment
         export NVM_DIR="$HOME/.nvm"

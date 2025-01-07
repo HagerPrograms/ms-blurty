@@ -74,6 +74,7 @@ jobs:
 
         # Install Node.js via nvm
         nvm install
+        nvm use
 
         # Stop running Node.js processes if any
         if pgrep node > /dev/null; then

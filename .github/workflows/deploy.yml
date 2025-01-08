@@ -85,6 +85,8 @@ jobs:
         # Install production dependencies
         npm install --production
         npm run build
-        npm run start &
+        npm run start
+        disown
+        exit 0
         EOF
         

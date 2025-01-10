@@ -38,6 +38,7 @@ jobs:
         nvm use node
         npm install -g npm
         npm i -g ts-node
+        rm -rf "/root/repo"
         EOF
 
 

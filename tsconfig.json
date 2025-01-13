@@ -1,4 +1,7 @@
 {
+  "ts-node": {
+    "files": true
+  },
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
@@ -7,14 +10,13 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": "./src",
+    "typeRoots": ["./src/types"],
     "paths": {
-      "*": ["node_modules/*"]
+      "*": ["./node_modules/*"]
     }
   },
   "include": [
-    "src/**/*"
-  ],
-  "exclude": ["node_modules"]
+    "./src/**/*",]
+  ,
+  "exclude": ["./node_modules"]
 }

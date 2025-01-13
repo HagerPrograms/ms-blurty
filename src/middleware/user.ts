@@ -12,6 +12,14 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
             req.headers.apikey === process.env['MS-BLURTY-USER-APIKEY'] ? 'USER' : 
             'UNAUTHORIZED'
 
+        if(userType === "UNAUTHORIZED"){
+            req.user = {
+                id: undefined,
+                role: "UNAUTHORIZED"
+            }
+            return res.status(401).send({error: "Access to this api has been denied."})
+        }
+
         user = await prisma.uSERS.findFirst({
             where: {
                 ip: user_ip
@@ -26,13 +34,19 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
             })
         }
 
-        if(userType === "UNAUTHORIZED"){
-            return res.status(401).send({error: "Access to this api has been denied."})
-        }
         if(user.status === "banned"){
+            req.user = {
+                id: user.id,
+                role: "UNAUTHORIZED"
+            }
             return res.status(401).send({error: "This user has been banned."})
         }
         if(user.id === undefined){
+            req.user = {
+                id: undefined,
+                role: "UNAUTHORIZED"
+            }
+            console.log('how?')
             return res.status(401).send({error: "This user was not found"})
         }
 
@@ -41,7 +55,7 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
             role: userType,
         }
 
-        return next()
+        next()
     }
     catch (error){
         return res.status(400).send({error: `Unable to locate user: ${req.body.ip}`, })

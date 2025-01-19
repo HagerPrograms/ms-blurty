@@ -86,7 +86,7 @@ jobs:
         # Install production dependencies
         npm install --production
         npm run build
-        nohup npm run start > /dev/null 2>&1 &
+        nohup npm run start:prod > /dev/null 2>&1 &
         disown
         exit 0
         EOF

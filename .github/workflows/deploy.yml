@@ -41,9 +41,8 @@ jobs:
         rm -rf "/root/repo"
         EOF
 
-
-    # Step 3: Deploy to VPS
-    - name: Deploy to VPS
+    # Step 2: Setup ENVs
+    - name: Setup ENVs
       env:
         PAT: ${{ secrets.PAT }}
         VPS_USER: ${{ secrets.VPS_USER }}
@@ -52,6 +51,27 @@ jobs:
         DATABASE_URL: ${{ secrets.DATABASE_URL}}
         MS_BLURTY_ADMIN_APIKEY: ${{ secrets.MS_BLURTY_ADMIN_APIKEY}}
         MS_BLURTY_CLIENT_APIKEY: ${{ secrets.MS_BLURTY_CLIENT_APIKEY}}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > ssh_key
+        chmod 600 ssh_key
+        ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
+        
+        # Setup environmental variables
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL}}" | sudo tee -a /etc/environment
+        echo "MS_BLURTY_ADMIN_APIKEY=${{ secrets.MS_BLURTY_ADMIN_APIKEY}}" | sudo tee -a /etc/environment
+        echo "MS_BLURTY_CLIENT_APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY}}" | sudo tee -a /etc/environment
+
+        source /etc/environment
+        EOF
+
+    # Step 3: Deploy to VPS
+    - name: Deploy to VPS
+      env:
+        PAT: ${{ secrets.PAT }}
+        VPS_USER: ${{ secrets.VPS_USER }}
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
       run: |
         echo "$SSH_PRIVATE_KEY" > ssh_key
         chmod 600 ssh_key
@@ -85,13 +105,6 @@ jobs:
           echo "Stopping running Node.js processes..."
           killall node
         fi
-
-        # Setup environmental variables
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL}}" | sudo tee -a /etc/environment
-        echo "MS_BLURTY_ADMIN_APIKEY=${{ secrets.MS_BLURTY_ADMIN_APIKEY}}" | sudo tee -a /etc/environment
-        echo "MS_BLURTY_CLIENT_APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY}}" | sudo tee -a /etc/environment
-
-        source /etc/environment
  
         # Install production dependencies
         npm install --production

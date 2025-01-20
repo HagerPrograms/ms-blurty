@@ -41,7 +41,7 @@ jobs:
         rm -rf "/root/repo"
         EOF
 
-    # Step 2: Setup ENVs
+    # Step 3: Setup ENVs
     - name: Setup ENVs
       env:
         PAT: ${{ secrets.PAT }}
@@ -64,7 +64,7 @@ jobs:
         source /etc/environment
         EOF
 
-    # Step 3: Deploy to VPS
+    # Step 4: Deploy to VPS
     - name: Deploy to VPS
       env:
         PAT: ${{ secrets.PAT }}

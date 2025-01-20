@@ -89,7 +89,7 @@ jobs:
         # Setup environmental variables
         echo "DATABASE_URL=${{ secrets.DATABASE_URL}}" | sudo tee -a /etc/environment
         echo "MS-BLURTY-ADMIN-APIKEY=${{ secrets.MS_BLURTY_ADMIN_APIKEY}}"
-        echo "MS-BLURTY-USER-APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY}}""
+        echo "MS-BLURTY-USER-APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY}}"
 
         # Install production dependencies
         npm install --production

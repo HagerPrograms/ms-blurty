@@ -50,8 +50,8 @@ jobs:
         VPS_HOST: ${{ secrets.VPS_HOST }}
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL}}
-        MS-BLURTY-ADMIN-APIKEY: ${{ secrets.MS_BLURTY_ADMIN_APIKEY}}
-        MS-BLURTY-USER-APIKEY: ${{ secrets.MS_BLURTY_CLIENT_APIKEY}}
+        MS_BLURTY_ADMIN_APIKEY: ${{ secrets.MS_BLURTY_ADMIN_APIKEY}}
+        MS_BLURTY_CLIENT_APIKEY: ${{ secrets.MS_BLURTY_CLIENT_APIKEY}}
       run: |
         echo "$SSH_PRIVATE_KEY" > ssh_key
         chmod 600 ssh_key
@@ -88,8 +88,8 @@ jobs:
 
         # Setup environmental variables
         echo "DATABASE_URL=${{ secrets.DATABASE_URL}}" | sudo tee -a /etc/environment
-        echo "MS-BLURTY-ADMIN-APIKEY=${{ secrets.MS_BLURTY_ADMIN_APIKEY}}" | sudo tee -a /etc/environment
-        echo "MS-BLURTY-USER-APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY}}" | sudo tee -a /etc/environment
+        echo "MS_BLURTY_ADMIN_APIKEY=${{ secrets.MS_BLURTY_ADMIN_APIKEY}}" | sudo tee -a /etc/environment
+        echo "MS_BLURTY_CLIENT_APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY}}" | sudo tee -a /etc/environment
 
         source /etc/environment
  

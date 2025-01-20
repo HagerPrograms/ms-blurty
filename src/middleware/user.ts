@@ -8,8 +8,8 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
     try{
         let user;
         const userType = 
-            req.headers.apikey === process.env['MS-BLURTY-ADMIN-APIKEY'] ? 'ADMIN' : 
-            req.headers.apikey === process.env['MS-BLURTY-USER-APIKEY'] ? 'USER' : 
+            req.headers.apikey === process.env['MS_BLURTY_ADMIN_APIKEY'] ? 'ADMIN' : 
+            req.headers.apikey === process.env['MS_BLURTY_USER_APIKEY'] ? 'USER' : 
             'UNAUTHORIZED'
 
         if(userType === "UNAUTHORIZED"){

@@ -28,7 +28,7 @@
     "build": "tsc",
     "start": "NODE_ENV=dev node dist/app.js",
     "dev": "NODE_ENV=dev nodemon",
-    "start:prod": "NODE_ENV=prod node dist/app.js",
+    "start:prod": "node dist/app.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "prisma:pull": "prisma db pull",

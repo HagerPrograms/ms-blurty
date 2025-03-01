@@ -4,9 +4,19 @@ import prisma from "../utils/prisma";
 
 
 const user = async (req: Request, res: Response, next: NextFunction) => {
-    const user_ip: string = req.body.ip
-    try{
+    const user_ip: string | string[] | undefined = req.headers['x-forwarded-for']
+        try{
+
+        if(!user_ip){
+            throw Error
+        }
+
+        if(Array.isArray(user_ip)){
+            throw Error
+        }
+
         let user;
+
         const userType = 
             req.headers.apikey === process.env['MS_BLURTY_ADMIN_APIKEY'] ? 'ADMIN' : 
             req.headers.apikey === process.env['MS_BLURTY_USER_APIKEY'] ? 'USER' : 
@@ -58,7 +68,8 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
         next()
     }
     catch (error){
-        return res.status(400).send({error: `Unable to locate user: ${req.body.ip}`, })
+        console.log(error)
+        return res.status(400).send({error: `Unable to locate user: ${user_ip}`, })
     }
 
 }

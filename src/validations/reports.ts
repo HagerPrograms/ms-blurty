@@ -1,9 +1,6 @@
 import Joi from "joi"
 
 export const getAllReportsValidation = {
-    body: Joi.object({
-        ip: Joi.string().required()
-    })
 }
 
 export const resolveOneReportValidation = {

@@ -5,14 +5,14 @@ import errorHandler from './middleware/error-handling'
 import { user } from './middleware/user'
 import health from './health'
 
-require('dotenv').config('')
+require('dotenv').config()
 
 const PORT = 8000
 
-app.use(express.json())
 app.use(user)
-app.use('/', routes)
+app.use(express.json())
 app.use('/', health)
+app.use('/', routes)
 app.use(errorHandler)
 //create user middleware with cache
 app.listen(PORT, () => {

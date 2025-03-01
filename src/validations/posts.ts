@@ -1,9 +1,6 @@
 import Joi from "joi"
 
 export const getPostsValidation = {
-    body: Joi.object({
-        ip: Joi.string().required(),
-    }),
     params: Joi.object({
         school: Joi.string().required()
     })
@@ -13,7 +10,6 @@ export const getPostsValidation = {
 export const createPostValidation = {
     body: Joi.object({
         text: Joi.string().required(),
-        ip: Joi.string().required(),
         school_id: Joi.number().required(),
         media_url: Joi.string().allow(null)
     })
@@ -23,21 +19,18 @@ export const deletePost = {
     params: Joi.object({
     }),
     body: Joi.object({
-        ip: Joi.string().required(),
         post_ids: Joi.array().items(Joi.number())
     })
 }
 
 export const unreactToPostsValidation = {
     body: Joi.object({
-        ip: Joi.string().required(),
         post_ids: Joi.array().items(Joi.number())
     })
 }
 
 export const reactToPostsValidation = {
     body: Joi.object({
-        ip: Joi.string().required(),
         likes: Joi.array().items(Joi.number()),
         dislikes: Joi.array().items(Joi.number()),
     })
@@ -48,7 +41,6 @@ export const createReportValidation = {
         post_id: Joi.number().required() 
     }),
     body: Joi.object({
-        ip: Joi.string().required(),
         text: Joi.string().required(),
     })
 }
@@ -56,7 +48,6 @@ export const createReportValidation = {
 export const createReplyValidation = {
     body: Joi.object({
         text: Joi.string().required(),
-        ip: Joi.string().required(),
         school_id: Joi.number().required(),
         media_url: Joi.string().allow(null),
         parent_post_id: Joi.number().required(),

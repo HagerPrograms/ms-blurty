@@ -56,7 +56,6 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
                 id: undefined,
                 role: "UNAUTHORIZED"
             }
-            console.log('how?')
             return res.status(401).send({error: "This user was not found"})
         }
 

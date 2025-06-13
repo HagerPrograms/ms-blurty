@@ -1,7 +1,10 @@
 import { Request, Response } from "express"
 import prisma from "../../utils/prisma"
-import { response } from "./response"
-import { equal } from "joi"
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import {forEach, keyBy} from 'lodash'
+
+dayjs.extend(utc)
 
 interface mostPost { 
   id: number, 
@@ -92,10 +95,10 @@ class AnalyticsController {
 
       return mostReactedToData
     }
+
     async GetTotalPostsMade(req: Request, _res: Response) {
-      const fiveDaysAgo = new Date();
-      fiveDaysAgo.setDate(fiveDaysAgo.getUTCDate() - 5);
-      fiveDaysAgo.setHours(0, 0, 0, 0); // start of the day
+      const today = dayjs().startOf('day').utc().toDate()
+      const fiveDaysAgo = dayjs(today).utc().subtract(5, 'day').toDate()
 
       const totalBeforeFiveDays = await prisma.pOSTS.count({
         where: {
@@ -114,14 +117,27 @@ class AnalyticsController {
           GROUP BY DATE("created_on")
           ORDER BY date ASC;`;
 
-      const dailyPosts = dailyPostCounts.map(day => {
-        return {
-          date: day.date,
-          count: Number(day.count)
+      const deltaMap = keyBy(dailyPostCounts, 'date')
+      const dates = [
+        dayjs(today).utc().subtract(5, 'day').toISOString(),
+        dayjs(today).utc().subtract(4, 'day').toISOString(),
+        dayjs(today).utc().subtract(3, 'day').toISOString(),
+        dayjs(today).utc().subtract(2, 'day').toISOString(),
+        dayjs(today).utc().subtract(1, 'day').toISOString(),
+      ]
+      let acc = 0 
+      const changeMap = dates.map((date) => {
+        if(deltaMap[date]){
+          acc += Number(deltaMap[date].count)
         }
-    })
-
-      return {delta: dailyPosts, previousTotal: totalBeforeFiveDays}
+        return {
+          date,
+          posts: totalBeforeFiveDays + acc
+        }
+      }) 
+      console.log(dates)
+      console.log(dailyPostCounts)
+      return changeMap
     }
 
 

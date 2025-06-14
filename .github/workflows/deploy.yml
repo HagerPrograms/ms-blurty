@@ -38,6 +38,7 @@ jobs:
         nvm use node
         npm install -g npm
         npm i -g ts-node
+        npm i pm2 -g
         rm -rf "/root/repo"
         EOF
 
@@ -109,8 +110,9 @@ jobs:
         # Install production dependencies
         npm install --production
         npm run build
-        nohup npm run start:prod > /dev/null 2>&1 &
-        disown
+        pm2 start app.js
+        pm2 save
+        pm2 startup
         exit 0
         EOF
         

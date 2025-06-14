@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import prisma from "../../utils/prisma"
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import {forEach, keyBy} from 'lodash'
+import { keyBy } from 'lodash'
 
 dayjs.extend(utc)
 
@@ -97,7 +97,7 @@ class AnalyticsController {
     }
 
     async GetTotalPostsMade(req: Request, _res: Response) {
-      const today = dayjs().startOf('day').utc().toDate()
+      const today = dayjs().utc().startOf('day').toDate()
       const fiveDaysAgo = dayjs(today).utc().subtract(5, 'day').toDate()
 
       const totalBeforeFiveDays = await prisma.pOSTS.count({
@@ -117,7 +117,7 @@ class AnalyticsController {
           GROUP BY DATE("created_on")
           ORDER BY date ASC;`;
 
-      const deltaMap = keyBy(dailyPostCounts, 'date')
+      const deltaMap = keyBy(dailyPostCounts.map((date) => ({...date, date: dayjs(date.date).utc().toISOString()})), 'date')
       const dates = [
         dayjs(today).utc().subtract(5, 'day').toISOString(),
         dayjs(today).utc().subtract(4, 'day').toISOString(),
@@ -134,9 +134,7 @@ class AnalyticsController {
           date,
           posts: totalBeforeFiveDays + acc
         }
-      }) 
-      console.log(dates)
-      console.log(dailyPostCounts)
+      })
       return changeMap
     }
 

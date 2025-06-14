@@ -67,8 +67,7 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
         next()
     }
     catch (error){
-        console.log(error)
-        return res.status(400).send({error: `Unable to locate user: ${user_ip}`, })
+        return res.status(400).send({error: `Unable to locate user`, })
     }
 
 }

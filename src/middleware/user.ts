@@ -19,7 +19,7 @@ const user = async (req: Request, res: Response, next: NextFunction) => {
 
         const userType = 
             req.headers.apikey === process.env['MS_BLURTY_ADMIN_APIKEY'] ? 'ADMIN' : 
-            req.headers.apikey === process.env['MS_BLURTY_USER_APIKEY'] ? 'USER' : 
+            req.headers.apikey === process.env['MS_BLURTY_CLIENT_APIKEY'] ? 'USER' : 
             'UNAUTHORIZED'
 
         if(userType === "UNAUTHORIZED"){

@@ -1,8 +1,13 @@
+import NodeCache from "node-cache"
 import { Request, Response } from "express"
 import prisma from "../../utils/prisma"
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { keyBy } from 'lodash'
+import { TRENDING_STATES } from "../../utils/constants"
+const trendingCache = new NodeCache();
+
+
 
 dayjs.extend(utc)
 
@@ -19,30 +24,90 @@ interface mostReactedTo {
   dislikes: number
 }
 
+interface TrendingPosts {
+  "id": number,
+  "text": string
+  "created_on": string,
+  "media_url": string,
+  "logical_delete_indicator": boolean,
+  "parent_post_id": number | null,
+  "school_id": number,
+  "author_id": number,
+  "reaction_count": number
+}
+
+interface TrendingPostsWithDirection {
+  "id": number,
+  "text": string
+  "created_on": string,
+  "media_url": string,
+  "logical_delete_indicator": boolean,
+  "parent_post_id": number | null,
+  "school_id": number,
+  "author_id": number,
+  "reaction_count": number
+  "trending_state": 0|1|2|null
+}
+
 
 class AnalyticsController {
-    async GetTrendingPosts(req: Request, _res: Response) {
-        const trendingPosts = await prisma.pOSTS.findMany({
-            where: {
-                parent_post_id: null
-            },
-            orderBy: {
-                created_on: 'desc'
-            },
-            take: 5
-        })
-        return trendingPosts
+    
+  async GetTrendingPosts(req: Request, _res: Response) {
+    const trendingPosts: TrendingPosts[] = await prisma.$queryRaw`
+      SELECT 
+        p.*, 
+        COUNT(r.id) AS reaction_count
+      FROM "POSTS" p
+      LEFT JOIN "REACTIONS" r 
+        ON p."id" = r."post_id" 
+        AND r."created_on" >= NOW() - INTERVAL '24 hours'
+      WHERE p."parent_post_id" IS NULL
+      GROUP BY p."id"
+      ORDER BY reaction_count DESC
+      LIMIT 10;
+      `
+      const cache = trendingCache?.get<TrendingPostsWithDirection[]>('trending') ?? []
+      
+      //compares prev cached state to new retrieved state, and determines direction
+      const trendingStates = cache.map((post: TrendingPostsWithDirection, prevIndex: number) => {
+        const currIndex = trendingPosts.findIndex(element => element.id === post.id)
+        const state: 0|1|2|null  = currIndex > prevIndex ?
+          TRENDING_STATES.DOWN :
+          currIndex < prevIndex ?
+          TRENDING_STATES.UP :
+          currIndex === prevIndex && post.trending_state !== null ? 
+          post.trending_state :
+          TRENDING_STATES.NONE
+        return {state, post: post.id}
+      })
+
+      //key by post id
+      const trendingStateMap = keyBy(trendingStates, 'post')
+
+      //create symmeterical data
+      const data: TrendingPostsWithDirection[] = trendingPosts.map((post: TrendingPosts) => {
+        return {
+          ...post,
+          reaction_count: Number(post.reaction_count),
+          trending_state: trendingStateMap?.[post.id]?.state ?? null
+        }
+      })
+
+      //set data in cache
+      trendingCache.set("trending", data)
+
+      return data
     }
-    //find schools with the most posts
+
     async GetMostPosts(req: Request, _res: Response) {
       const mostPostsQuery: mostPost[] = await prisma.$queryRaw`
-      SELECT s.id, s.name, COUNT(p.id) as post_count
-      FROM "SCHOOLS" s
-      LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NULL
-      GROUP BY s.id
-      ORDER BY post_count DESC
-      LIMIT 5
-    `
+        SELECT s.id, s.name, COUNT(p.id) as post_count
+        FROM "SCHOOLS" s
+        LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NULL
+        GROUP BY s.id
+        ORDER BY post_count DESC
+        LIMIT 5
+      `
 
     const mostPostsData: {name: string, postCount: number}[] = mostPostsQuery.map((post: mostPost) => {
       return {
@@ -53,6 +118,7 @@ class AnalyticsController {
 
     return mostPostsData
     }
+
     async GetMostReplies(req: Request, _res: Response) { 
       const mostRepliesQuery: mostPost[] = await prisma.$queryRaw`
       SELECT s.id, s.name, COUNT(p.id) as post_count
@@ -73,7 +139,7 @@ class AnalyticsController {
     return mostPostsData
     }
 
-  async GetMostReactedTo(req: Request, _res: Response) {
+    async GetMostReactedTo(req: Request, _res: Response) {
       const mostReactionToQuery: mostReactedTo[] = await prisma.$queryRaw`
         SELECT post_id,
         COUNT(*) as total_reactions,
@@ -87,9 +153,9 @@ class AnalyticsController {
       const mostReactedToData = mostReactionToQuery.map(post => {
         return {
           postId: Number(post.post_id),
-          totalReactions: post.total_reaction,
-          likes: post.likes,
-          dislikes: post.dislikes
+          totalReactions: Number(post.total_reaction),
+          likes: Number(post.likes),
+          dislikes: Number(post.dislikes)
         }
       })
 
@@ -139,7 +205,7 @@ class AnalyticsController {
     }
 
 
-    async GetAnalytics (req: Request, res: Response){
+    async GetAnalytics (req: Request, res: Response) {
         const trendingPosts = await this.GetTrendingPosts(req, res)
         const mostPosts = await this.GetMostPosts(req, res)
         const mostReplies = await this.GetMostReplies(req, res)

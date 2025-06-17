@@ -110,6 +110,7 @@ jobs:
         # Install production dependencies
         npm install --production
         npm run build
+        pm2 stop app
         pm2 start app.js
         pm2 save
         pm2 startup

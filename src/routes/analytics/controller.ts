@@ -61,7 +61,8 @@ class AnalyticsController {
       LEFT JOIN "REACTIONS" r 
         ON p."id" = r."post_id" 
         AND r."created_on" >= NOW() - INTERVAL '24 hours'
-      WHERE p."parent_post_id" IS NULL
+      WHERE p."parent_post_id" IS NULL 
+        AND p."logical_delete_indicator" = false
       GROUP BY p."id"
       ORDER BY reaction_count DESC
       LIMIT 10;
@@ -104,6 +105,7 @@ class AnalyticsController {
         SELECT s.id, s.name, COUNT(p.id) as post_count
         FROM "SCHOOLS" s
         LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NULL
+        WHERE p."logical_delete_indicator" = false
         GROUP BY s.id
         ORDER BY post_count DESC
         LIMIT 5
@@ -124,6 +126,7 @@ class AnalyticsController {
       SELECT s.id, s.name, COUNT(p.id) as post_count
       FROM "SCHOOLS" s
       LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NOT NULL
+      WHERE p."logical_delete_indicator" = false
       GROUP BY s.id
       ORDER BY post_count DESC
       LIMIT 5
@@ -141,12 +144,15 @@ class AnalyticsController {
 
     async GetMostReactedTo(req: Request, _res: Response) {
       const mostReactionToQuery: mostReactedTo[] = await prisma.$queryRaw`
-        SELECT post_id,
-        COUNT(*) as total_reactions,
-        SUM(CASE WHEN r."reaction_type" = 'like' THEN 1 ELSE 0 END) as likes,
-        SUM(CASE WHEN r."reaction_type" = 'dislike' THEN 1 ELSE 0 END) as dislikes
+        SELECT 
+          r.post_id,
+          COUNT(*) AS total_reactions,
+          SUM(CASE WHEN r."reaction_type" = 'like' THEN 1 ELSE 0 END) AS likes,
+          SUM(CASE WHEN r."reaction_type" = 'dislike' THEN 1 ELSE 0 END) AS dislikes
         FROM "REACTIONS" r
-        GROUP BY post_id
+        JOIN "POSTS" p ON r."post_id" = p."id"
+        WHERE p."logical_delete_indicator" = false
+        GROUP BY r.post_id
         ORDER BY total_reactions DESC
         LIMIT 5;
       `

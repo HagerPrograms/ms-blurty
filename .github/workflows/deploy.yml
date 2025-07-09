@@ -3,117 +3,78 @@ name: Deploy to VPS
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Check out the repository
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # Step 2: Setup VPS
-    - name: Setup VPS
-      env:
-        PAT: ${{ secrets.PAT }}
-        VPS_USER: ${{ secrets.VPS_USER }}
-        VPS_HOST: ${{ secrets.VPS_HOST }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      run: |
-        echo "$SSH_PRIVATE_KEY" > ssh_key
-        chmod 600 ssh_key
-        ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
-        
-        # Install NVM
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-  
-        # Set up NVM environment
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # Load nvm
-  
-        # Install Node.js and npm
-        nvm install node
-        nvm use node
-        npm install -g npm
-        npm i -g ts-node
-        nvm use 18.18.0
-        npm install pm2 -g
-        export PATH=$PATH:./node_modules/.bin
-        pm2 -v
-        rm -rf "/root/repo"
-        EOF
+      - name: Setup and Deploy to VPS
+        env:
+          PAT: ${{ secrets.PAT }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          MS_BLURTY_ADMIN_APIKEY: ${{ secrets.MS_BLURTY_ADMIN_APIKEY }}
+          MS_BLURTY_CLIENT_APIKEY: ${{ secrets.MS_BLURTY_CLIENT_APIKEY }}
+        run: |
+          set -e
+          trap 'echo "[ERROR] Deployment script failed on GitHub runner"; exit 1' ERR
+          echo "$SSH_PRIVATE_KEY" > ssh_key
+          chmod 600 ssh_key
 
-    # Step 3: Setup ENVs
-    - name: Setup ENVs
-      env:
-        PAT: ${{ secrets.PAT }}
-        VPS_USER: ${{ secrets.VPS_USER }}
-        VPS_HOST: ${{ secrets.VPS_HOST }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        DATABASE_URL: ${{ secrets.DATABASE_URL}}
-        MS_BLURTY_ADMIN_APIKEY: ${{ secrets.MS_BLURTY_ADMIN_APIKEY}}
-        MS_BLURTY_CLIENT_APIKEY: ${{ secrets.MS_BLURTY_CLIENT_APIKEY}}
-      run: |
-        echo "$SSH_PRIVATE_KEY" > ssh_key
-        chmod 600 ssh_key
-        ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
-        
-        # Setup environmental variables
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL}}" | sudo tee -a /etc/environment
-        echo "MS_BLURTY_ADMIN_APIKEY=${{ secrets.MS_BLURTY_ADMIN_APIKEY}}" | sudo tee -a /etc/environment
-        echo "MS_BLURTY_CLIENT_APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY}}" | sudo tee -a /etc/environment
+          ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
+          set -e
+          trap 'echo "[ERROR] Deployment failed inside SSH session at line \$LINENO"; exit 1' ERR
+          echo "[INFO] Starting deployment on VPS..."
 
-        source /etc/environment
-        EOF
+          # Setup NVM and Node
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-    # Step 4: Deploy to VPS
-    - name: Deploy to VPS
-      env:
-        PAT: ${{ secrets.PAT }}
-        VPS_USER: ${{ secrets.VPS_USER }}
-        VPS_HOST: ${{ secrets.VPS_HOST }}
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          echo "[INFO] Installing Node.js..."
+          nvm install 18.18.0
+          nvm use 18.18.0
 
-      run: |
-        echo "$SSH_PRIVATE_KEY" > ssh_key
-        chmod 600 ssh_key
-        ssh -i ssh_key -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
-        # Define project directory
-        PROJECT_DIR="/root/repo"
+          echo "[INFO] Installing global tools..."
+          npm install -g npm ts-node pm2
+          pm2 -v
 
-        # Load nvm environment
-        export NVM_DIR="$HOME/.nvm"
-        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+          echo "[INFO] Setting environment variables..."
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" | sudo tee /etc/environment
+          echo "MS_BLURTY_ADMIN_APIKEY=${{ secrets.MS_BLURTY_ADMIN_APIKEY }}" | sudo tee -a /etc/environment
+          echo "MS_BLURTY_CLIENT_APIKEY=${{ secrets.MS_BLURTY_CLIENT_APIKEY }}" | sudo tee -a /etc/environment
+          source /etc/environment
 
-        # Check if project directory exists
-        if [ ! -d "$PROJECT_DIR" ]; then
-          echo "Directory $PROJECT_DIR does not exist. Cloning repository..."
-          git clone https://$PAT@github.com/HagerPrograms/ms-blurty.git $PROJECT_DIR
-        else
-          echo "Directory $PROJECT_DIR exists. Pulling latest changes..."
+          PROJECT_DIR="/root/repo"
+
+          echo "[INFO] Cloning or updating repository..."
+          if [ ! -d "$PROJECT_DIR" ]; then
+            git clone https://$PAT@github.com/HagerPrograms/ms-blurty.git $PROJECT_DIR
+          else
+            cd $PROJECT_DIR
+            git pull origin main
+          fi
+
           cd $PROJECT_DIR
-          git pull origin main
-        fi
 
-        # Navigate to project directory
-        source ~/.bashrc
-        cd ~
-        cd $PROJECT_DIR 
-        echo $PROJECT_DIR
+          echo "[INFO] Installing dependencies and building project..."
+          npm install --omit=dev
+          npm run build
 
-        # Install Node.js via nvm
-        nvm install
-        nvm use
- 
-        # Install production dependencies
-        npm install --omit-dev
-        npm run build
-        pm2 stop app
-        pm2 start app
-        pm2 save
-        pm2 startup
-        exit 0
-        EOF
-        
+          echo "[INFO] Restarting app with PM2..."
+          pm2 reload app || pm2 start app
+          pm2 save
+          pm2 startup
+
+          echo "[INFO] Deployment completed successfully."
+          EOF
+
+      - name: Clean up SSH key
+        run: rm -f ssh_key

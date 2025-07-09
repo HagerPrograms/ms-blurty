@@ -43,7 +43,7 @@ jobs:
           nvm use 18.18.0
 
           echo "[INFO] Installing global tools..."
-          npm install -g npm ts-node pm2
+          npm install -g pm2
           pm2 -v
 
           echo "[INFO] Setting environment variables..."

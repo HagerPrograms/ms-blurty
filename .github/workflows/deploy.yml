@@ -39,6 +39,8 @@ jobs:
         npm install -g npm
         npm i -g ts-node
         npm install pm2 -g
+        export PATH=$PATH:./node_modules/.bin
+        pm2 -v
         rm -rf "/root/repo"
         EOF
 

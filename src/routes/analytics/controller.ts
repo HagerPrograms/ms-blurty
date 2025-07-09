@@ -55,17 +55,23 @@ class AnalyticsController {
   async GetTrendingPosts(req: Request, _res: Response) {
     const trendingPosts: TrendingPosts[] = await prisma.$queryRaw`
       SELECT 
-        p.*, 
-        COUNT(r.id) AS reaction_count
+        p.*,
+        s.name as school_name,
+        s.abbreviation as school_abbreviation,
+        COALESCE(r.reaction_count, 0) AS reaction_count
       FROM "POSTS" p
-      LEFT JOIN "REACTIONS" r 
-        ON p."id" = r."post_id" 
-        AND r."created_on" >= NOW() - INTERVAL '24 hours'
-      WHERE p."parent_post_id" IS NULL 
-        AND p."logical_delete_indicator" = false
-      GROUP BY p."id"
+      LEFT JOIN (
+        SELECT post_id, COUNT(id) AS reaction_count
+        FROM "REACTIONS"
+        WHERE created_on >= NOW() - INTERVAL '24 hours'
+        GROUP BY post_id
+      ) r ON r.post_id = p.id
+      LEFT JOIN "SCHOOLS" s ON p.school_id = s.id
+      WHERE p.parent_post_id IS NULL 
+        AND p.logical_delete_indicator = false
       ORDER BY reaction_count DESC
       LIMIT 10;
+
       `
       const cache = trendingCache?.get<TrendingPostsWithDirection[]>('trending') ?? []
       

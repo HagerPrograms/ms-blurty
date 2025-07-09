@@ -65,7 +65,7 @@ jobs:
           cd $PROJECT_DIR
 
           echo "[INFO] Installing dependencies and building project..."
-          npm install --omit=dev
+          npm install
           npm run build
 
           echo "[INFO] Restarting app with PM2..."

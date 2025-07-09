@@ -102,7 +102,7 @@ jobs:
         nvm use
  
         # Install production dependencies
-        npm install --production
+        npm ci
         npm run build
         pm2 stop app
         pm2 start app.js

@@ -97,7 +97,9 @@ jobs:
         fi
 
         # Navigate to project directory
-        cd $PROJECT_DIR
+
+        cd $PROJECT_DIR 
+        echo $PROJECT_DIR
 
         # Install Node.js via nvm
         nvm install

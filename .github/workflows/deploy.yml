@@ -100,12 +100,6 @@ jobs:
         # Install Node.js via nvm
         nvm install
         nvm use
-
-        # Stop running Node.js processes if any
-        if pgrep node > /dev/null; then
-          echo "Stopping running Node.js processes..."
-          killall node
-        fi
  
         # Install production dependencies
         npm install --production

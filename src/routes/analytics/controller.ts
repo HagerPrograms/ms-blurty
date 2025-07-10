@@ -14,7 +14,7 @@ dayjs.extend(utc)
 interface mostPost { 
   id: number, 
   name: string, 
-  post_count: bigint 
+  postCount: bigint 
 }
 
 interface mostReactedTo {
@@ -48,6 +48,16 @@ interface TrendingPostsWithDirection {
   "reaction_count": number
   "trending_state": 0|1|2|null
 }
+
+declare global {
+  interface BigInt {
+    toJSON(): number;
+  }
+}
+
+BigInt.prototype.toJSON = function () {
+  return Number(this);
+};
 
 
 class AnalyticsController {
@@ -108,19 +118,18 @@ class AnalyticsController {
 
     async GetMostPosts(req: Request, _res: Response) {
       const mostPostsQuery: mostPost[] = await prisma.$queryRaw`
-        SELECT s.*, COUNT(p.id) as post_count
+        SELECT s.*, COUNT(p.id) as postCount
         FROM "SCHOOLS" s
         LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NULL
         WHERE p."logical_delete_indicator" = false
         GROUP BY s.id
-        ORDER BY post_count DESC
+        ORDER BY postCount DESC
         LIMIT 5
       `
 
-    const mostPostsData: {name: string, postCount: number}[] = mostPostsQuery.map((post: mostPost) => {
+    const mostPostsData = mostPostsQuery.map((post: mostPost) => {
       return {
-        name: post.name,
-        postCount: Number(post.post_count)
+        ...post
       }
     })
 
@@ -129,23 +138,22 @@ class AnalyticsController {
 
     async GetMostReplies(req: Request, _res: Response) { 
       const mostRepliesQuery: mostPost[] = await prisma.$queryRaw`
-      SELECT s.*, COUNT(p.id) as post_count
+      SELECT s.*, COUNT(p.id) as postCount
       FROM "SCHOOLS" s
       LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NOT NULL
       WHERE p."logical_delete_indicator" = false
       GROUP BY s.id
-      ORDER BY post_count DESC
+      ORDER BY postCount DESC
       LIMIT 5
     `
 
-    const mostPostsData: {name: string, postCount: number}[] = mostRepliesQuery.map((reply: mostPost) => {
+    const mostReplies = mostRepliesQuery.map((reply: mostPost) => {
       return {
-        name: reply.name,
-        postCount: Number(reply.post_count)
+        ...reply
       }
     })
 
-    return mostPostsData
+    return mostReplies
     }
 
     async GetMostReactedTo(req: Request, _res: Response) {

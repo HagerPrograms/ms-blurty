@@ -37,9 +37,7 @@ const getPostsResponse = (getPostsResponse: GetPostsResponse[]) => {
         reaction_count,
         replies: post.other_POSTS?.map((reply) => {
             return {
-                id: reply.id,
-                text: reply.text,
-                media_url: reply.media_url,
+                ...reply,
                 reaction_count: countReactions(reply as Post)
             }
         }) ?? []

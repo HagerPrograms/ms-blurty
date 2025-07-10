@@ -159,16 +159,16 @@ class AnalyticsController {
     async mostDisliked(req: Request, _res: Response) {
       const mostReactionToQuery: mostReactedTo[] = await prisma.$queryRaw`
         SELECT 
-          s."name",
+          s."abbreviation",
           COUNT(*) AS dislike_count
         FROM "REACTIONS" r
         JOIN "POSTS" p ON r."post_id" = p."id"
         JOIN "SCHOOLS" s ON p."school_id" = s."id"
         WHERE r."reaction_type" = 'dislike'
           AND r."created_on" >= NOW() - INTERVAL '30 days'
-        GROUP BY s."name"
+        GROUP BY s."abbreviation"
         ORDER BY dislike_count DESC
-        LIMIT 5;
+        LIMIT 5
       `
       const mostReactedToData = mostReactionToQuery.map(post => {
         return {

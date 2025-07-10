@@ -156,26 +156,23 @@ class AnalyticsController {
     return mostReplies
     }
 
-    async GetMostReactedTo(req: Request, _res: Response) {
+    async mostDisliked(req: Request, _res: Response) {
       const mostReactionToQuery: mostReactedTo[] = await prisma.$queryRaw`
         SELECT 
-          r.post_id,
-          COUNT(*) AS total_reactions,
-          SUM(CASE WHEN r."reaction_type" = 'like' THEN 1 ELSE 0 END) AS likes,
-          SUM(CASE WHEN r."reaction_type" = 'dislike' THEN 1 ELSE 0 END) AS dislikes
+          s."name",
+          COUNT(*) AS dislike_count
         FROM "REACTIONS" r
         JOIN "POSTS" p ON r."post_id" = p."id"
-        WHERE p."logical_delete_indicator" = false
-        GROUP BY r.post_id
-        ORDER BY total_reactions DESC
+        JOIN "SCHOOLS" s ON p."school_id" = s."id"
+        WHERE r."reaction_type" = 'dislike'
+          AND r."created_on" >= NOW() - INTERVAL '30 days'
+        GROUP BY s."name"
+        ORDER BY dislike_count DESC
         LIMIT 5;
       `
       const mostReactedToData = mostReactionToQuery.map(post => {
         return {
-          postId: Number(post.post_id),
-          totalReactions: Number(post.total_reaction),
-          likes: Number(post.likes),
-          dislikes: Number(post.dislikes)
+          ...post,
         }
       })
 
@@ -229,14 +226,14 @@ class AnalyticsController {
         const trendingPosts = await this.GetTrendingPosts(req, res)
         const mostPosts = await this.GetMostPosts(req, res)
         const mostReplies = await this.GetMostReplies(req, res)
-        const mostReactedTo = await this.GetMostReactedTo(req, res)
+        const mostDisliked = await this.mostDisliked(req, res)
         const totalPostsMade = await this.GetTotalPostsMade(req, res)
 
         return {
           trendingPosts,
           mostPosts,
           mostReplies,
-          mostReactedTo,
+          mostDisliked,
           totalPostsMade
         }
     }

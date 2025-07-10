@@ -108,7 +108,7 @@ class AnalyticsController {
 
     async GetMostPosts(req: Request, _res: Response) {
       const mostPostsQuery: mostPost[] = await prisma.$queryRaw`
-        SELECT s.id, s.name, COUNT(p.id) as post_count
+        SELECT s.*, COUNT(p.id) as post_count
         FROM "SCHOOLS" s
         LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NULL
         WHERE p."logical_delete_indicator" = false
@@ -129,7 +129,7 @@ class AnalyticsController {
 
     async GetMostReplies(req: Request, _res: Response) { 
       const mostRepliesQuery: mostPost[] = await prisma.$queryRaw`
-      SELECT s.id, s.name, COUNT(p.id) as post_count
+      SELECT s.*, COUNT(p.id) as post_count
       FROM "SCHOOLS" s
       LEFT JOIN "POSTS" p ON p."school_id" = s.id AND p."parent_post_id" IS NOT NULL
       WHERE p."logical_delete_indicator" = false

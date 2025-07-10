@@ -184,12 +184,12 @@ class AnalyticsController {
 
     async GetTotalPostsMade(req: Request, _res: Response) {
       const today = dayjs().utc().startOf('day').toDate()
-      const fiveDaysAgo = dayjs(today).utc().subtract(5, 'day').toDate()
+      const fiveWeeksAgo = dayjs(today).utc().subtract(5, 'week').toDate()
 
       const totalBeforeFiveDays = await prisma.pOSTS.count({
         where: {
           created_on: {
-            lt: fiveDaysAgo,
+            lt: fiveWeeksAgo,
           },
         },
       });
@@ -199,17 +199,17 @@ class AnalyticsController {
           DATE("created_on") as date,
           COUNT(*) as count
           FROM "POSTS"
-          WHERE "created_on" >= CURRENT_DATE - INTERVAL '4 days'
+          WHERE "created_on" >= CURRENT_DATE - INTERVAL '4 weeks'
           GROUP BY DATE("created_on")
           ORDER BY date ASC;`;
 
       const deltaMap = keyBy(dailyPostCounts.map((date) => ({...date, date: dayjs(date.date).utc().toISOString()})), 'date')
       const dates = [
-        dayjs(today).utc().subtract(5, 'day').toISOString(),
-        dayjs(today).utc().subtract(4, 'day').toISOString(),
-        dayjs(today).utc().subtract(3, 'day').toISOString(),
-        dayjs(today).utc().subtract(2, 'day').toISOString(),
-        dayjs(today).utc().subtract(1, 'day').toISOString(),
+        dayjs(today).utc().subtract(5, 'week').toISOString(),
+        dayjs(today).utc().subtract(4, 'week').toISOString(),
+        dayjs(today).utc().subtract(3, 'week').toISOString(),
+        dayjs(today).utc().subtract(2, 'week').toISOString(),
+        dayjs(today).utc().subtract(1, 'week').toISOString(),
       ]
       let acc = 0 
       const changeMap = dates.map((date) => {

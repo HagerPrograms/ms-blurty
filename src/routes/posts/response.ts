@@ -40,6 +40,7 @@ const getPostsResponse = (getPostsResponse: GetPostsResponse[]) => {
         replies: post.other_POSTS?.map((reply) => {
             return {
                 ...reply,
+                post_id: reply.id,
                 reaction_count: countReactions(reply as Post)
             }
         }) ?? []

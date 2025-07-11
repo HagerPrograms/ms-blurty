@@ -30,6 +30,8 @@ const getPostsResponse = (getPostsResponse: GetPostsResponse[]) => {
 
     
     return {
+        school_abbreviation: school?.abbreviation ?? null,
+        school_name: school?.name ?? null,
         text,
         created_on,
         post_id,

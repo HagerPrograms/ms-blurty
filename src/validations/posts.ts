@@ -41,7 +41,7 @@ export const createReportValidation = {
         post_id: Joi.number().required() 
     }),
     body: Joi.object({
-        text: Joi.string().required(),
+        text: Joi.string(),
     })
 }
 
